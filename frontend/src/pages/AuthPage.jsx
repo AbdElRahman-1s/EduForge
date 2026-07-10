@@ -94,7 +94,10 @@ function AuthPage() {
           }
 
           <div className="btns-container">
-            <button className="sign-in-up-btn">{signToggle ? 'Sign in to learnify' : 'Create your account'}</button>
+            <button className="sign-in-up-btn">
+              {signToggle ? 'Sign in to learnify' : 'Create your account'}
+              <span>or</span>
+            </button>
 
             <button className="with-google-btn">
               <FcGoogle /> Continue with Google
