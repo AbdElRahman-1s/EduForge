@@ -74,7 +74,7 @@
   width: 500px;
   background-color: whitesmoke;
   box-shadow: -10px 10px 8px rgba(0, 0, 0, 0.09);
-  padding: 50px 30px;
+  padding: 50px 30px 15px;
   margin-bottom: 20px;
   border-radius: 10px;
 }
