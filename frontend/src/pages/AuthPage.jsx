@@ -2,7 +2,6 @@ import { useState } from "react";
 import { IoBookOutline } from "react-icons/io5";
 import { MdOutlineEmail } from "react-icons/md";
 import { FiKey } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
 import { RxPerson } from "react-icons/rx";
 import './auth-page.css'
 
@@ -16,7 +15,7 @@ function AuthPage() {
       <div className="container">
         <div className="title">
           <span><IoBookOutline /></span>
-          <h2>Learnify</h2>
+          <h2>EduForge</h2>
         </div>
         <div className="sign-in-up">
           <button onClick={() => setSignToggle(!signToggle)} className={signToggle ? `sign-active` : 'sign-no-active'}>Sign In</button>
@@ -95,12 +94,7 @@ function AuthPage() {
 
           <div className="btns-container">
             <button className="sign-in-up-btn">
-              {signToggle ? 'Sign in to learnify' : 'Create your account'}
-              <span>or</span>
-            </button>
-
-            <button className="with-google-btn">
-              <FcGoogle /> Continue with Google
+              {signToggle ? 'Sign in to EduForge' : 'Create your account'}
             </button>
 
           </div>

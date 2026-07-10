@@ -99,7 +99,7 @@
 }
 
 .email-input,.pass-input,.name-input{
-  width: 88%;
+  width: 100%;
   padding: 15px 30px;
   border-radius: 15px;
   border: 1px solid rgba(0, 0, 0, 0.09);
@@ -135,6 +135,7 @@
 .sign-in-up-btn{
   position: relative;
   padding: 15px 30px;
+  margin-top: 30px;
   border-radius: 15px;
   border: none;
   font-size: 17px;
@@ -144,18 +145,7 @@
   cursor: pointer ;
   transition: 0.15s;
 }
-.sign-in-up-btn span{
-  position: absolute;
-  background-color: white;
-  color: oklch(0.705 0.015 286.067);
-  font-size: 12px;
-  padding: 2px 4px;
-  border-radius: 50%;
-  bottom: -38px;
-  z-index: 5;
-  left: 45%;
-  right: 50%;
-}
+
 
 .sign-in-up-btn::after{
   content: 'or';
@@ -172,29 +162,11 @@
     background-color: oklch(42.553% 0.23065 290.732);
 }
 
-.sign-in-up-btn:active,.with-google-btn:active{
+.sign-in-up-btn:active{
   scale: 98%;
 }
 
 
-.with-google-btn{
-  width: 100%;
-  padding: 15px 30px;
-  border-radius: 15px;
-  border: 1px solid rgba(0, 0, 0, 0.09);
-  font-size: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: white;
-  gap: 15px;
-  cursor: pointer;
-  transition: 0.15s;
-}
-
-.with-google-btn:hover{
-  background-color: rgb(220, 220, 220);
-}
 
 /*responsive*/
 
