@@ -1,13 +1,45 @@
 import { useState } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { IoBookOutline } from "react-icons/io5";
 import { MdOutlineEmail } from "react-icons/md";
 import { FiKey } from "react-icons/fi";
 import { RxPerson } from "react-icons/rx";
 import './auth-page.css'
+import { useNavigate } from "react-router-dom";
 
 function AuthPage() {
 
   const [signToggle, setSignToggle] = useState(true);
+
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  function handleLogin() {
+  const fakeUser = {
+    id: 1,
+    name: "abdo",
+    role: "student",
+  };
+
+  login(fakeUser);
+
+
+  navigate("/dashboard");
+}
+  function handleRegister() {
+
+    const newUser = {
+      id: 1,
+      name: "Abdo",
+      email: "abdo@gmail.com",
+      role: "student",
+    };
+
+    login(newUser);
+
+    navigate("/dashboard");
+  }
 
 
   return (
@@ -57,7 +89,7 @@ function AuthPage() {
               <div className="name-container">
                 <label className="name-label">Full name</label>
                 <div className="svg-name-relative">
-                  <input className="name-input" type="text" placeholder="Abdo Adel"/>
+                  <input className="name-input" type="text" placeholder="Abdo Adel" />
                   <RxPerson />
                 </div>
               </div>
@@ -87,15 +119,30 @@ function AuthPage() {
                   <FiKey />
                 </div>
               </div>
+              <div className="password-container">
+                <label className="pass-label">Confirm password</label>
+                <div className="svg-pass-relative">
+                  <input className="pass-input" type="password" placeholder="confirm your password" />
+                  <FiKey />
+                </div>
+              </div>
 
             </form>
 
           }
 
           <div className="btns-container">
-            <button className="sign-in-up-btn">
-              {signToggle ? 'Sign in to EduForge' : 'Create your account'}
-            </button>
+            {signToggle ? <button
+              className="sign-in-up-btn"
+              onClick={handleLogin}
+            >Sign in to EduForge
+            </button> :
+              <button 
+              className="sign-in-up-btn"
+              onClick={handleRegister}
+              >
+                Create your account
+              </button>}
 
           </div>
         </div>
