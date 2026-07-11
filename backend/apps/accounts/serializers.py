@@ -70,3 +70,18 @@ class LogoutSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {"refresh": ["Token is invalid or expired."]}
             )
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    date_join = serializers.DateTimeField(source="created_at")
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "date_join",
+        ]
