@@ -2,11 +2,18 @@ import { Routes, Route } from "react-router-dom";
 import AuthPage from './pages/AuthPage'
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoutes";
+import Navbar from "./components/Navbar";
 import './App.css'
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
 
   return (
+<>
+<ProtectedRoute>
+<Navbar />
+</ProtectedRoute>
+
  <Routes>
   <Route path="/" element={<AuthPage />}/>
      <Route
@@ -17,7 +24,16 @@ function App() {
             </ProtectedRoute>
         }
     />
+     <Route
+        path="/profile"
+        element={
+            <ProtectedRoute>
+                <ProfilePage/>
+            </ProtectedRoute>
+        }
+    />
  </Routes>
+ </>
   )
 }
 

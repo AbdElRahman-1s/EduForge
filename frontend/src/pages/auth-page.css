@@ -188,3 +188,28 @@
     justify-content: center;
   }
 }
+
+.succes{
+  position: absolute;
+  top: -25px;
+  right: 65%;
+  left: 35%;
+  color: rgb(4, 160, 4);
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+
+/*error style*/
+
+.error{
+  font-size: 12px;
+  font-weight: bold;
+  color: red;
+  padding-top: 10px;
+}

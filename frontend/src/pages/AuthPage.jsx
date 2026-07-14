@@ -7,38 +7,122 @@ import { FiKey } from "react-icons/fi";
 import { RxPerson } from "react-icons/rx";
 import './auth-page.css'
 import { useNavigate } from "react-router-dom";
+import axios from 'axios'
 
 function AuthPage() {
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [succesMessage, setSuccesMessage] = useState('');
+  const [seeMessage, setSeeMessage] = useState(false);
+
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const [confirm_password, setConfirmPassword] = useState("");
+
+  const [errorName, setErrorName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [signToggle, setSignToggle] = useState(true);
 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  function handleLogin() {
-  const fakeUser = {
-    id: 1,
-    name: "abdo",
-    role: "student",
-  };
+ async function handleLogin() {
+  let response;
 
-  login(fakeUser);
+  
 
+   try{
 
-  navigate("/dashboard");
-}
-  function handleRegister() {
+    setIsLoading(true);
 
-    const newUser = {
-      id: 1,
-      name: "Abdo",
-      email: "abdo@gmail.com",
-      role: "student",
-    };
+     response = await axios.post('http://127.0.0.1:8000/api/auth/login/',{
+        email,
+        password
+    });
 
-    login(newUser);
+    
+
+  }catch(error){  
+    const errors = error.response?.data;
+
+    if(errors.detail){
+        setErrorMessage(errors.detail);
+        setErrorName('detail');
+      }else if(errors.email){
+        setErrorMessage(errors.email[0]);
+        setErrorName('email');
+      }else if(errors.password){
+        setErrorMessage(errors.password[0]);
+        setErrorName('password');
+      }
+    
+
+  }finally{
+    setIsLoading(false);
+  }
+
+  
+  console.log(response.data.access);
+  
+    login(response.data.user,response.data.access);
+    localStorage.setItem("refresh", response.data.refresh);
 
     navigate("/dashboard");
+  }
+
+  
+  async function handleRegister() {
+    let response
+    try {
+
+      setIsLoading(true);
+
+      response = await axios.post('http://127.0.0.1:8000/api/auth/register/', {
+        username,
+        email,
+        password,
+        confirm_password
+      });
+
+      setSuccesMessage(response.data.message);
+      setSeeMessage(true);
+      setTimeout(() => {
+        setSeeMessage(false);
+      }, 3000);
+
+      
+
+      // alert(response.data.message);
+      // login(response);
+      // navigate("/dashboard");
+    } catch (error) {
+      const errors = error.response?.data;
+
+      if (errors.username) {
+        setErrorMessage(errors.username[0]);
+        setErrorName('username');
+      } else if (errors.email) {
+        setErrorMessage(errors.email[0]);
+        setErrorName('email');
+      } else if (errors.password) {
+        setErrorMessage(errors.password[0]);
+        setErrorName('password');
+      } else if (errors.confirm_password) {
+        setErrorMessage(errors.confirm_password[0]);
+        setErrorName('confirmpassword');
+      }
+    }finally{
+      setIsLoading(false);
+    }
+
+    setUsername('')
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+
   }
 
 
@@ -59,7 +143,14 @@ function AuthPage() {
               <div className="email-container">
                 <label className="email-label">Email address</label>
                 <div className="svg-email-relative">
-                  <input className="email-input" type="email" name="email" placeholder="your email address" />
+                  <input 
+                  className="email-input" 
+                  type="email" 
+                  name="email" 
+                  placeholder="your email address" 
+                  onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <p className="error">{(errorName === 'email' || errorName === 'detail') && errorMessage}</p>
                   <MdOutlineEmail />
                 </div>
               </div>
@@ -77,7 +168,13 @@ function AuthPage() {
               <div className="password-container">
                 <label className="pass-label">Password</label>
                 <div className="svg-pass-relative">
-                  <input className="pass-input" type="password" placeholder="your password" />
+                  <input 
+                  className="pass-input" 
+                  type="password" 
+                  placeholder="your password"
+                  onChange={(e) => setPassword(e.target.value)}
+                   />
+                   <p className="error">{(errorName === 'password' || errorName === 'detail') && errorMessage}</p>
                   <FiKey />
                 </div>
               </div>
@@ -87,9 +184,19 @@ function AuthPage() {
           {!signToggle &&
             <form className="form">
               <div className="name-container">
-                <label className="name-label">Full name</label>
+                <label
+                  className="name-label"
+
+                >Username</label>
                 <div className="svg-name-relative">
-                  <input className="name-input" type="text" placeholder="Abdo Adel" />
+                  <input
+                    className="name-input"
+                    type="text"
+                    placeholder="your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                  <p className="error">{errorName === 'username' && errorMessage}</p>
                   <RxPerson />
                 </div>
               </div>
@@ -97,7 +204,15 @@ function AuthPage() {
               <div className="email-container">
                 <label className="email-label">Email address</label>
                 <div className="svg-email-relative">
-                  <input className="email-input" type="email" name="email" placeholder="your email address" />
+                  <input
+                    className="email-input"
+                    type="email"
+                    name="email"
+                    placeholder="your email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <p className="error">{errorName === 'email' && errorMessage}</p>
                   <MdOutlineEmail />
                 </div>
               </div>
@@ -115,14 +230,28 @@ function AuthPage() {
               <div className="password-container">
                 <label className="pass-label">Password</label>
                 <div className="svg-pass-relative">
-                  <input className="pass-input" type="password" placeholder="your password" />
+                  <input
+                    className="pass-input"
+                    type="password"
+                    placeholder="your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <p className="error">{errorName === 'password' && errorMessage}</p>
                   <FiKey />
                 </div>
               </div>
               <div className="password-container">
                 <label className="pass-label">Confirm password</label>
                 <div className="svg-pass-relative">
-                  <input className="pass-input" type="password" placeholder="confirm your password" />
+                  <input
+                    className="pass-input"
+                    type="password"
+                    placeholder="confirm your password"
+                    value={confirm_password}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                  <p className="error">{errorName === 'confirmpassword' && errorMessage}</p>
                   <FiKey />
                 </div>
               </div>
@@ -133,14 +262,17 @@ function AuthPage() {
 
           <div className="btns-container">
             {signToggle ? <button
+              disabled={isLoading}
               className="sign-in-up-btn"
               onClick={handleLogin}
             >Sign in to EduForge
             </button> :
-              <button 
-              className="sign-in-up-btn"
-              onClick={handleRegister}
+              <button
+                disabled={isLoading}
+                className="sign-in-up-btn"
+                onClick={handleRegister}
               >
+                <span className="succes">{seeMessage && succesMessage}</span>
                 Create your account
               </button>}
 
