@@ -6,14 +6,17 @@ import axios from "axios";
 function Navbar() {
   
 
-  const { logout } = useContext(AuthContext);
+  const { logout , accessToken} = useContext(AuthContext);
   const navigate = useNavigate();
 
   async function handleLogout() {
     try {
       await axios.post(
         "http://127.0.0.1:8000/api/auth/logout/",
-        {},
+        {},{
+         headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }},
         {
           withCredentials: true,
         }
