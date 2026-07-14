@@ -12,6 +12,7 @@ class AuthenticationTests(APITestCase):
         self.login_url = reverse("login")
         self.logout_url = reverse("logout")
         self.profile_url = reverse("profile")
+        self.refresh_url = reverse("refresh_token")
 
         self.user_data = {
             "username": "test_user",
@@ -25,6 +26,12 @@ class AuthenticationTests(APITestCase):
             email="existing@example.com",
             password="ExistingPassword123!",
         )
+
+    def _login_and_get_tokens(self):
+        refresh = RefreshToken.for_user(self.existing_user)
+        access = str(refresh.access_token)
+        self.client.cookies["refresh"] = str(refresh)
+        return str(refresh), access
 
     # Registration
 
@@ -51,7 +58,7 @@ class AuthenticationTests(APITestCase):
     # Login
 
     def test_successful_login(self):
-        """Should authenticate valid credentials and return access/refresh tokens."""
+        """Should authenticate valid credentials, return access token, and set refresh cookie."""
         login_payload = {
             "email": "existing@example.com",
             "password": "ExistingPassword123!",
@@ -59,8 +66,10 @@ class AuthenticationTests(APITestCase):
         response = self.client.post(self.login_url, login_payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("access", response.data)
-        self.assertIn("refresh", response.data)
         self.assertEqual(response.data["user"]["email"], login_payload["email"])
+        self.assertIn("refresh", response.cookies)
+        self.assertEqual(response.cookies["refresh"]["httponly"], True)
+        self.assertEqual(response.cookies["refresh"]["path"], "/api/auth/")
 
     def test_login_invalid_password(self):
         """Should reject right email with wrong password with 401."""
@@ -80,6 +89,7 @@ class AuthenticationTests(APITestCase):
         }
         response = self.client.post(self.login_url, login_payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data["detail"], "Invalid email or password.")
 
     # Profile
 
@@ -89,32 +99,56 @@ class AuthenticationTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_profile_access_authenticated(self):
-        """Should allow access and return customized profile details with a valid bearer token."""
-        # Authenticate the request by manually forcing it or passing credentials
-        self.client.force_authenticate(user=self.existing_user)
+        """Should allow access and return the contract profile payload with a valid bearer token."""
+        _, access = self._login_and_get_tokens()
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
 
         response = self.client.get(self.profile_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["username"], self.existing_user.username)
-        self.assertIn("date_join", response.data)
+        self.assertIn("date_joined", response.data)
+        self.assertIn("first_name", response.data)
+        self.assertIn("last_name", response.data)
 
     # Logout
 
     def test_successful_logout_blacklists_token(self):
-        """Should accept a valid active refresh token, blacklist it, and return 205."""
-        self.client.force_authenticate(user=self.existing_user)
-
-        # Generate real SimpleJWT tokens for our test user
+        """Should blacklist the refresh cookie and return 205."""
         refresh = RefreshToken.for_user(self.existing_user)
-        logout_payload = {"refresh": str(refresh)}
+        access = str(refresh.access_token)
+        self.client.cookies["refresh"] = str(refresh)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
 
-        response = self.client.post(self.logout_url, logout_payload, format="json")
+        response = self.client.post(self.logout_url, {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
+        self.assertEqual(response.data["message"], "Logged out successfully.")
+        self.assertIn("refresh", response.cookies)
+        self.assertEqual(response.cookies["refresh"]["max-age"], 0)
 
     def test_logout_with_invalid_or_expired_token(self):
-        """Should fail with 400 when attempting to blacklist a garbage/corrupted token string."""
-        self.client.force_authenticate(user=self.existing_user)
-        logout_payload = {"refresh": "this-is-not-a-valid-jwt-token-string"}
+        """Should fail with 401 when the refresh cookie is missing or invalid."""
+        refresh = RefreshToken.for_user(self.existing_user)
+        access = str(refresh.access_token)
+        self.client.cookies["refresh"] = "this-is-not-a-valid-jwt-token-string"
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
 
-        response = self.client.post(self.logout_url, logout_payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.post(self.logout_url, {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data["detail"], "Invalid refresh token.")
+
+    # Refresh
+
+    def test_successful_refresh(self):
+        """Should read the refresh cookie and return a new access token."""
+        refresh = RefreshToken.for_user(self.existing_user)
+        self.client.cookies["refresh"] = str(refresh)
+
+        response = self.client.post(self.refresh_url, {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+
+    def test_refresh_without_cookie(self):
+        """Should reject refresh requests that do not include the refresh cookie."""
+        response = self.client.post(self.refresh_url, {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data["detail"], "Refresh token not provided.")
