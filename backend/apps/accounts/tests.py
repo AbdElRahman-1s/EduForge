@@ -19,12 +19,14 @@ class AuthenticationTests(APITestCase):
             "email": "test@example.com",
             "password": "SecurePassword123!",
             "confirm_password": "SecurePassword123!",
+            "role": User.Role.STUDENT,
         }
 
         self.existing_user = User.objects.create_user(
             username="existing_user",
             email="existing@example.com",
             password="ExistingPassword123!",
+            role=User.Role.INSTRUCTOR,
         )
 
     def _login_and_get_tokens(self):
@@ -40,6 +42,7 @@ class AuthenticationTests(APITestCase):
         response = self.client.post(self.register_url, self.user_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["user"]["username"], self.user_data["username"])
+        self.assertEqual(response.data["user"]["role"], self.user_data["role"])
         self.assertTrue(User.objects.filter(email=self.user_data["email"]).exists())
 
     def test_registration_password_mismatch(self):
@@ -67,6 +70,7 @@ class AuthenticationTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("access", response.data)
         self.assertEqual(response.data["user"]["email"], login_payload["email"])
+        self.assertEqual(response.data["user"]["role"], self.existing_user.role)
         self.assertIn("refresh", response.cookies)
         self.assertEqual(response.cookies["refresh"]["httponly"], True)
         self.assertEqual(response.cookies["refresh"]["path"], "/api/auth/")
@@ -106,6 +110,7 @@ class AuthenticationTests(APITestCase):
         response = self.client.get(self.profile_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["username"], self.existing_user.username)
+        self.assertEqual(response.data["role"], self.existing_user.role)
         self.assertIn("date_joined", response.data)
         self.assertIn("first_name", response.data)
         self.assertIn("last_name", response.data)
