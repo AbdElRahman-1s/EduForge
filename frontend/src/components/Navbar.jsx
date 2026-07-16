@@ -12,7 +12,7 @@ function Navbar() {
   async function handleLogout() {
     try {
       await axios.post(
-        "http://127.0.0.1:8000/api/auth/logout/",
+        "/api/auth/logout/",
         {},{
          headers: {
           Authorization: `Bearer ${accessToken}`,

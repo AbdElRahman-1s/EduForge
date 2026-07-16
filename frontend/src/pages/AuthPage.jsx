@@ -38,10 +38,13 @@ function AuthPage() {
 
     setIsLoading(true);
 
-     response = await axios.post('http://127.0.0.1:8000/api/auth/login/',{
+     response = await axios.post('/api/auth/login/',{
         email,
         password
-    });
+    },{
+      withCredentials: true
+    }
+  );
 
     
 
@@ -65,10 +68,10 @@ function AuthPage() {
   }
 
   
-  console.log(response.data.access);
+
   
     login(response.data.user,response.data.access);
-    localStorage.setItem("refresh", response.data.refresh);
+   
 
     navigate("/dashboard");
   }
@@ -80,7 +83,7 @@ function AuthPage() {
 
       setIsLoading(true);
 
-      response = await axios.post('http://127.0.0.1:8000/api/auth/register/', {
+      response = await axios.post('/api/auth/register/', {
         username,
         email,
         password,

@@ -4,18 +4,18 @@ import { Link } from "react-router-dom";
 
 function Dashboard() {
 
-    const { user ,logout} = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
 
-    function handelLogout(){
-        logout();
-    }
+   
+
+ if(!user) return <h2></h2>
+ 
 
     return (
         <>
             <h1>Dashboard</h1>
             <div>
-                <h1>Hello {user.name}</h1>
-                <button onClick={handelLogout}>Logout</button>
+                <h1>Hello {user.username}</h1>
             </div>
             <Link to="/profile">Profile</Link>
         </>

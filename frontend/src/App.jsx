@@ -15,7 +15,7 @@ function App() {
 </ProtectedRoute>
 
  <Routes>
-  <Route path="/" element={<AuthPage />}/>
+  <Route path="/auth" element={<AuthPage />}/>
      <Route
         path="/dashboard"
         element={
