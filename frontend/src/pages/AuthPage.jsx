@@ -11,15 +11,18 @@ import axios from 'axios'
 
 function AuthPage() {
 
+  const [typeCheck, setTypeCheck] = useState(null);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [succesMessage, setSuccesMessage] = useState('');
   const [seeMessage, setSeeMessage] = useState(false);
 
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [confirm_password, setConfirmPassword] = useState("");
+  const [role, setRole] = useState();
 
   const [errorName, setErrorName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -29,55 +32,62 @@ function AuthPage() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
- async function handleLogin() {
-  let response;
+  async function handleLogin() {
+    let response;
 
-  
 
-   try{
 
-    setIsLoading(true);
+    try {
 
-     response = await axios.post('/api/auth/login/',{
+      setIsLoading(true);
+
+      response = await axios.post('/api/auth/login/', {
         email,
         password
-    },{
-      withCredentials: true
-    }
-  );
+      }, {
+        withCredentials: true
+      }
+      );
 
-    
 
-  }catch(error){  
-    const errors = error.response?.data;
 
-    if(errors.detail){
+    } catch (error) {
+      const errors = error.response?.data;
+
+      if (errors.detail) {
         setErrorMessage(errors.detail);
         setErrorName('detail');
-      }else if(errors.email){
+      } else if (errors.email) {
         setErrorMessage(errors.email[0]);
         setErrorName('email');
-      }else if(errors.password){
+      } else if (errors.password) {
         setErrorMessage(errors.password[0]);
         setErrorName('password');
       }
-    
 
-  }finally{
-    setIsLoading(false);
-  }
 
-  
+    } finally {
+      setIsLoading(false);
+    }
 
-  
-    login(response.data.user,response.data.access);
-   
+
+
+
+    login(response.data.user, response.data.access);
+
 
     navigate("/dashboard");
   }
 
-  
+
   async function handleRegister() {
+
+    if (!role) {
+      setTypeCheck('please select a role');
+      return;
+    }
+
+
     let response
     try {
 
@@ -87,7 +97,8 @@ function AuthPage() {
         username,
         email,
         password,
-        confirm_password
+        confirm_password,
+        role
       });
 
       setSuccesMessage(response.data.message);
@@ -96,7 +107,13 @@ function AuthPage() {
         setSeeMessage(false);
       }, 3000);
 
-      
+      console.log(response.data.user.role);
+
+
+      setUsername('')
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
 
       // alert(response.data.message);
       // login(response);
@@ -117,14 +134,11 @@ function AuthPage() {
         setErrorMessage(errors.confirm_password[0]);
         setErrorName('confirmpassword');
       }
-    }finally{
+    } finally {
       setIsLoading(false);
     }
 
-    setUsername('')
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
+
 
   }
 
@@ -146,38 +160,28 @@ function AuthPage() {
               <div className="email-container">
                 <label className="email-label">Email address</label>
                 <div className="svg-email-relative">
-                  <input 
-                  className="email-input" 
-                  type="email" 
-                  name="email" 
-                  placeholder="your email address" 
-                  onChange={(e) => setEmail(e.target.value)}
+                  <input
+                    className="email-input"
+                    type="email"
+                    name="email"
+                    placeholder="your email address"
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                   <p className="error">{(errorName === 'email' || errorName === 'detail') && errorMessage}</p>
                   <MdOutlineEmail />
                 </div>
               </div>
-              <div className="job-type">
-                <label>
-                  <input type="radio" name="job" value="student" />
-                  Student
-                </label>
 
-                <label>
-                  <input type="radio" name="job" value="teacher" />
-                  Teacher
-                </label>
-              </div>
               <div className="password-container">
                 <label className="pass-label">Password</label>
                 <div className="svg-pass-relative">
-                  <input 
-                  className="pass-input" 
-                  type="password" 
-                  placeholder="your password"
-                  onChange={(e) => setPassword(e.target.value)}
-                   />
-                   <p className="error">{(errorName === 'password' || errorName === 'detail') && errorMessage}</p>
+                  <input
+                    className="pass-input"
+                    type="password"
+                    placeholder="your password"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <p className="error">{(errorName === 'password' || errorName === 'detail') && errorMessage}</p>
                   <FiKey />
                 </div>
               </div>
@@ -221,15 +225,29 @@ function AuthPage() {
               </div>
               <div className="job-type">
                 <label>
-                  <input type="radio" name="job" value="student" />
+                  <input
+                    type="radio"
+                    name="job"
+                    value="student"
+                    required
+                    onChange={(e) => setRole(e.target.value)}
+                  />
                   Student
                 </label>
 
                 <label>
-                  <input type="radio" name="job" value="teacher" />
-                  Teacher
+                  <input
+                    type="radio"
+                    name="job"
+                    value="instructor"
+                    required
+                    onChange={(e) => setRole(e.target.value)}
+                  />
+                  Instructor
                 </label>
+                <p className="error-type">{typeCheck && typeCheck}</p>
               </div>
+
               <div className="password-container">
                 <label className="pass-label">Password</label>
                 <div className="svg-pass-relative">
@@ -271,6 +289,7 @@ function AuthPage() {
             >Sign in to EduForge
             </button> :
               <button
+                type="submit"
                 disabled={isLoading}
                 className="sign-in-up-btn"
                 onClick={handleRegister}

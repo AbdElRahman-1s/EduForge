@@ -207,9 +207,13 @@ button:disabled {
 
 /*error style*/
 
-.error{
+.error,.error-type{
   font-size: 12px;
   font-weight: bold;
   color: red;
   padding-top: 10px;
+}
+
+.error-type{
+  padding: 2px 0px;
 }
