@@ -17,6 +17,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "confirm_password",
+            "role",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -65,5 +66,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "username",
             "email",
+            "role",
             "date_joined",
         ]

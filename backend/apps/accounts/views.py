@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,7 +11,6 @@ from .serializers import (
     LoginSerializer,
     ProfileSerializer,
 )
-from .models import User
 
 # Create your views here.
 
@@ -35,6 +35,7 @@ class RegistrationView(APIView):
                     "id": user.id,
                     "username": user.username,
                     "email": user.email,
+                    "role": user.role,
                 },
             },
             status=status.HTTP_201_CREATED,
@@ -52,14 +53,13 @@ class LoginView(APIView):
         email = serializer.validated_data.get("email")
         password = serializer.validated_data.get("password")
 
-        user = User.objects.filter(email=email).first()
+        user = authenticate(
+            request=request,
+            username=email,
+            password=password,
+        )
 
-        if user is not None:
-            is_password_correct = user.check_password(password)
-        else:
-            is_password_correct = False
-
-        if not is_password_correct:
+        if user is None:
             return Response(
                 {"detail": "Invalid email or password."},
                 status=status.HTTP_401_UNAUTHORIZED,
@@ -73,6 +73,7 @@ class LoginView(APIView):
                     "id": user.id,
                     "username": user.username,
                     "email": user.email,
+                    "role": user.role,
                 },
             },
             status=status.HTTP_200_OK,
