@@ -16,6 +16,7 @@ function Dashboard() {
             <h1>Dashboard</h1>
             <div>
                 <h1>Hello {user.username}</h1>
+                <h3>your role is {user.role}</h3>
             </div>
             <Link to="/profile">Profile</Link>
         </>
