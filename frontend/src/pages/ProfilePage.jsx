@@ -1,14 +1,15 @@
-import { useContext, useEffect } from "react";
-import axios from "axios";
+ import { useContext} from "react";
+// import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
 function ProfilePage() {
   console.log('profile render');
   
 
-  const { accessToken } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
-
+//move it to authProvider and put the values into 'user state ' then use the user with context her or in any page need personal info
+/*
   useEffect(() => {
     async function getProfile() {
       try {
@@ -30,9 +31,12 @@ function ProfilePage() {
     if (accessToken) {
       getProfile();
     }
-  }, [accessToken]);
+  }, [accessToken]);*/
 
-  return <h1>Profile Page</h1>;
+ if(!user) return <h2></h2>
+
+
+  return <h1>Profile Page hi <span>{user.username}</span></h1>;
 }
 
 export default ProfilePage;

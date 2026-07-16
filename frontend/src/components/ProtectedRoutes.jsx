@@ -6,11 +6,11 @@ function ProtectedRoute({ children }) {
 
     const { /*user*/  accessToken , loading} = useContext(AuthContext);
     if(loading){
-        return <h1>Loading...</h1>
+        return <h1></h1>
     }
 
     if(!accessToken){
-        return <Navigate to="/" />;
+        return <Navigate to="/auth" />;
     }
 
     return children;

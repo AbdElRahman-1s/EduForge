@@ -6,11 +6,7 @@ import { AuthContext } from "./AuthContext";
 
 export function AuthProvider({children}){
 
-  const [user,setUser] = useState(() => {
-  const savedUser = localStorage.getItem("user");
-    
-  return savedUser ? JSON.parse(savedUser) : null;
-});
+  const [user,setUser] = useState(null);
 
 const [accessToken, setAccessToken] = useState(null);
 const [loading , setLoading] = useState(true);
@@ -20,7 +16,7 @@ useEffect(() => {
   async function refreshAccessToken() {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/auth/refresh/",
+        "/api/auth/token/refresh/",
         null,
         {
           withCredentials: true,
@@ -40,11 +36,37 @@ useEffect(() => {
 }, []);
 
 
+ useEffect(() => {
+    async function getMe() {
+      try {
+        const response = await axios.get(
+          "/api/auth/me/",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        );
+
+       
+        setUser(response.data);
+        
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (accessToken) {
+      getMe();
+    }
+  }, [accessToken]);
+
+
 
   function login(userData , token){
-    console.log("Token before set:", token);
+    
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    
     setAccessToken(token);
   }
 
@@ -52,15 +74,11 @@ useEffect(() => {
     console.log('loged out');
     
     setUser(null);
-    localStorage.removeItem("user");
      setAccessToken(null);
   }
 
 
-  console.log({
-  user,
-  accessToken,
-});
+
 
   return(
     <AuthContext.Provider
