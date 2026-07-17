@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoutes";
 import Navbar from "./components/Navbar";
 import './App.css'
 import ProfilePage from "./pages/ProfilePage";
+import CoursesPage from "./pages/CoursesPage";
 
 function App() {
 
@@ -32,6 +33,8 @@ function App() {
             </ProtectedRoute>
         }
     />
+
+    <Route path='/courses' element={<CoursesPage />} />
  </Routes>
  </>
   )
