@@ -1,5 +1,8 @@
 import './courses-page.css';
-
+import HeroCourses from '../components/HeroCourses';
+import Categories from '../components/Categories';
+import Statistics from '../components/Statistics';
+import CourseSection from '../components/CourseSection';
 function CoursesPage() {
   return (
 
@@ -8,9 +11,10 @@ function CoursesPage() {
 
     <div className='courses-body'>
 
-      <h1>hiiiiiiiiiii</h1>
-
-
+      <HeroCourses />
+      <Categories />
+      <Statistics />
+      <CourseSection />
     </div>
     </>
   )
