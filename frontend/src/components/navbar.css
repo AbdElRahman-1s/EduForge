@@ -28,6 +28,9 @@
   font-size: 18px;
   cursor: pointer;
 }
+.middle-section .active{
+  color: oklch(0.541 0.281 293.009);
+}
 
 .right-section{
   display: flex;

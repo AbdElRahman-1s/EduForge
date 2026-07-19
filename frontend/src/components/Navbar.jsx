@@ -22,6 +22,9 @@ function Navbar() {
   }
 
 
+  const [activeToggle , setActiveToggle] = useState(true);
+ 
+
 
   return (
     <>
@@ -37,8 +40,18 @@ function Navbar() {
           </div>
 
           <div className="middle-section">
-            <span>Browse</span>
-            <span>My Courses</span>
+            <span 
+            className={activeToggle && "active"}
+            onClick={() => {setActiveToggle(true)}}
+            >
+              Browse
+            </span>
+            <span 
+            className={!activeToggle && "active"}
+            onClick={() => {setActiveToggle(false)}}
+            >
+              My Courses
+            </span>
 
           </div>
 
