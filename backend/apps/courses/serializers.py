@@ -13,7 +13,7 @@ class InstructorSerializer(serializers.ModelSerializer):
         ]
 
 
-class CourseCreateSerializer(serializers.ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):
     instructor = InstructorSerializer(read_only=True)
 
     class Meta:
