@@ -1,0 +1,136 @@
+.side-content-sm {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  width: 70px;
+  background-color: oklch(0.21 0.006 285.885);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.flex-side-sm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.logo-title-menu-sm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  padding-left: 4px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgb(45, 45, 45);
+}
+
+
+.logo-title-menu-sm svg {
+  color: oklch(0.552 0.016 285.938);
+}
+.logo-title-menu-sm svg:hover{
+  color: white;
+}
+
+.logo-title-sm {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo-title-sm .logo-side-sm {
+  display: flex;
+  align-items: center;
+  background-color: oklch(0.541 0.281 293.009);
+  padding: 6px 8px;
+  border-radius: 100px;
+}
+
+.logo-title-sm .logo-side-sm svg {
+  color: white;
+}
+
+
+
+
+
+.dashboard-side-sm,
+.courses-side-sm,
+.users-side-sm {
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: oklch(0.705 0.015 286.067);
+  padding: 6px 12px;
+  margin-left: 12px;
+  border-radius: 20px;
+  margin-top: 5px;
+  font-size: 18px;
+  transition: 0.15s;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.dashboard-side-sm:hover,
+.courses-side-sm:hover,
+.users-side-sm:hover,
+.setting-sm:hover {
+  background-color: oklch(0.274 0.006 286.033);
+  color: white;
+}
+
+
+
+.selected-sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 13px;
+  color: white;
+  background-color: oklch(0.541 0.281 293.009);
+  padding: 6px 12px;
+  border-radius: 13px;
+  margin-top: 5px;
+  margin-left: 7px;
+} 
+
+
+.logout-setting-sm {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  padding-left: 5px;
+  gap: 10px;
+  width: fit-content;
+  border-top: 1px solid rgb(45, 45, 45);
+}
+
+.setting-sm {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 13px;
+  color: oklch(0.705 0.015 286.067);
+  cursor: pointer;
+}
+
+.logout-side-sm {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 13px;
+  color: oklch(0.704 0.191 22.216);
+  cursor: pointer;
+}
+
+.logout-side-sm:hover {
+  color: oklch(0.808 0.114 19.571);
+  background-color: oklab(0.637 0.214213 0.1014 / 0.1);
+}
