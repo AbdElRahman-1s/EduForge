@@ -25,4 +25,5 @@ class CourseSerializer(serializers.ModelSerializer):
             "instructor",
             "published",
             "created_at",
+            "updated_at",
         ]
