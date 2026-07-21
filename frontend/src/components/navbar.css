@@ -66,9 +66,9 @@ nav{
 
 .notification-div .notification-num{
   position: absolute;
-  top: -6px;
-  right: -5px;
-  background-color: red;
+  top: -5px;
+  right: -4px;
+  background-color: oklch(0.541 0.281 293.009);
   padding: 1px 5px;
   border-radius: 100%;
   font-size: 12px;

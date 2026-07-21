@@ -2,7 +2,6 @@ import { Routes, Route } from "react-router-dom";
 import AuthPage from './pages/AuthPage'
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoutes";
-import Navbar from "./components/Navbar";
 import './App.css'
 import ProfilePage from "./pages/ProfilePage";
 import CoursesPage from "./pages/CoursesPage";
@@ -11,9 +10,6 @@ function App() {
 
   return (
 <>
-<ProtectedRoute>
-<Navbar />
-</ProtectedRoute>
 
  <Routes>
   <Route path="/auth" element={<AuthPage />}/>
