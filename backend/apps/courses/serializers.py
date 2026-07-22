@@ -27,3 +27,15 @@ class CourseSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+class InstructorCourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "title",
+            "description",
+            "published",
+            "created_at",
+        ]

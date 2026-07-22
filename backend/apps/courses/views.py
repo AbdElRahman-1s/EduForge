@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .serializers import CourseSerializer
+from .serializers import CourseSerializer, InstructorCourseSerializer
 from .models import Course
 from .permissions import IsInstructor, IsCourseOwner
 
@@ -37,3 +37,11 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == "GET":
             return []
         return [IsAuthenticated(), IsInstructor(), IsCourseOwner()]
+
+
+class InstructorCourseListView(generics.ListAPIView):
+    serializer_class = InstructorCourseSerializer
+    permission_classes = [IsAuthenticated, IsInstructor]
+
+    def get_queryset(self):
+        return Course.objects.filter(instructor=self.request.user)
