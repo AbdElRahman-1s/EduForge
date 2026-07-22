@@ -1,10 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import AuthPage from './pages/AuthPage'
-import Dashboard from "./pages/Dashboard";
+import AuthPage from './pages/auth-page/AuthPage';
+import Dashboard from "./pages/dashboard-page/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import './App.css'
 import ProfilePage from "./pages/ProfilePage";
-import CoursesPage from "./pages/CoursesPage";
+import CoursesPage from "./pages/courses-page/CoursesPage";
 
 function App() {
 

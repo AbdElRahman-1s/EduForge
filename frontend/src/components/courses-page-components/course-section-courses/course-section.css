@@ -33,6 +33,7 @@
 
 .course-cards .course-card .imgs-course {
   width: 100%;
+  overflow: hidden;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
   position: relative;
