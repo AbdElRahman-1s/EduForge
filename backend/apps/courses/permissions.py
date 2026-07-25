@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from accounts.models import User
+from apps.accounts.models import User
 
 
 class IsInstructor(BasePermission):
