@@ -17,6 +17,7 @@ const detailsCourseCard = [
     lessons: '148',
     level: 'Beginner',
     price: '$89',
+    id: crypto.randomUUID()
   },
   {
     absolute: 'Bestseller',
@@ -29,6 +30,7 @@ const detailsCourseCard = [
     lessons: '148',
     level: 'Beginner',
     price: '$89',
+    id: crypto.randomUUID()
   },
   {
     absolute: 'Bestseller',
@@ -41,6 +43,7 @@ const detailsCourseCard = [
     lessons: '148',
     level: 'Beginner',
     price: '$89',
+    id: crypto.randomUUID()
   },
   {
     absolute: 'Bestseller',
@@ -53,6 +56,7 @@ const detailsCourseCard = [
     lessons: '148',
     level: 'Beginner',
     price: '$89',
+    id: crypto.randomUUID()
   },
   {
     absolute: 'Bestseller',
@@ -65,6 +69,7 @@ const detailsCourseCard = [
     lessons: '148',
     level: 'Beginner',
     price: '$89',
+    id: crypto.randomUUID()
   },
   {
     absolute: 'Bestseller',
@@ -77,6 +82,7 @@ const detailsCourseCard = [
     lessons: '148',
     level: 'Beginner',
     price: '$89',
+    id: crypto.randomUUID()
   }
 ]
 
@@ -93,7 +99,7 @@ function CourseSection() {
             detailsCourseCard.map((deatailsCard) => {
               return (
 
-                <div key={deatailsCard.title} className='course-card'>
+                <div key={deatailsCard.id} className='course-card'>
 
                   <div className="imgs-course">
                     <img src={deatailsCard.img} alt="big course image" />

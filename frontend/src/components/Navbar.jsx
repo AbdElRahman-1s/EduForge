@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { useNavigate , Link} from "react-router-dom";
+import { AuthContext} from "../context/AuthContext";
 import { IoBookOutline } from "react-icons/io5";
 import { IoIosNotificationsOutline, IoIosArrowDown,  IoIosArrowUp} from "react-icons/io";
 import { FiLogOut } from "react-icons/fi";
@@ -40,14 +40,16 @@ function Navbar() {
           </div>
 
           <div className="middle-section">
+            <Link to="/courses">
             <span 
             className={activeToggle && "active"}
             onClick={() => {setActiveToggle(true)}}
             >
               Browse
             </span>
+            </Link>
             <span 
-            className={!activeToggle && "active"}
+            className={!activeToggle ? "active" : ''}
             onClick={() => {setActiveToggle(false)}}
             >
               My Courses

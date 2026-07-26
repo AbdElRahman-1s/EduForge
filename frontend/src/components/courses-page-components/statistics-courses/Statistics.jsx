@@ -38,7 +38,7 @@ function Statistics() {
       <div className="statistics-div">
       {statistics.map((statistic) => {
         return(
-          <div className="statistic-div"> 
+          <div key={statistic.title} className="statistic-div"> 
             <span className="svg-span">{statistic.icon}</span>
             <div className="text-div">
               <p>{statistic.number}</p>

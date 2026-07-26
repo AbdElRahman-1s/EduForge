@@ -67,7 +67,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb(252, 248, 248);
+  background-color: oklab(0.999994 0.0000455678 0.0000200868 / 0.9);
   padding: 14px 16px;
   border-radius: 100%;
   display: none;
