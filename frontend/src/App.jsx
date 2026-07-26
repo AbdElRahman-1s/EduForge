@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoutes";
 import './App.css'
 import ProfilePage from "./pages/ProfilePage";
 import CoursesPage from "./pages/courses-page/CoursesPage";
+import CourseDetails from "./pages/course-details-page/CourseDetails";
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
     />
 
     <Route path='/courses' element={<CoursesPage />} />
+    <Route path="/course/details" element={<CourseDetails />} />
  </Routes>
  </>
   )
