@@ -1,4 +1,4 @@
-.top-part {
+.users-top-part {
   padding: 30px;
 }
 
@@ -31,12 +31,12 @@
   border: 1px solid oklab(0.822919 0.0331728 -0.0768415);
 }
 
-.bottom-part {
+.users-bottom-part {
   padding: 0px 30px 30px 30px;
 }
 
 
-.grid-users {
+.users-grid-users {
   display: grid;
   grid-template-columns: 1fr;
   gap: 15px;
@@ -46,7 +46,7 @@
   box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.16);
 }
 
-.users-head {
+.users-users-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -55,7 +55,8 @@
   color: oklch(0.552 0.016 285.938);
   gap: 10px;
 }
-.left-header{
+
+.left-header {
   padding-left: 10px;
 }
 
@@ -67,7 +68,7 @@
 }
 
 
-.user-details {
+.users-user-details {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -79,23 +80,29 @@
   padding: 15px 10px;
 }
 
-.user-details:hover {
+.users-user-details:hover {
   background-color: oklch(0.985 0 0);
 }
 
-.user-details:last-child {
+.users-left-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.users-user-details:last-child {
   border: none;
   padding-bottom: 0px;
 }
 
 
-.user-name-email {
+.users-user-name-email {
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
-.letter-div {
+.users-letter-div {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,21 +115,30 @@
   border-radius: 150px;
 }
 
-.name-users {
+.users-name-users {
   font-weight: 550;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 15px;
 }
 
-.email-users {
+.users-email-users {
   color: oklch(0.705 0.015 286.067);
   font-size: 15px;
 }
 
 
+.users-mid-details {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 75%;
+  margin-right: 50px;
+}
 
-.joined-users,
-.courses-users {
+
+
+.users-joined-users,
+.users-courses-users {
   color: oklch(0.552 0.016 285.938);
   font-size: 13px;
 }
@@ -143,11 +159,14 @@
   width: 100px;
 }
 
-.right-details {
+.users-right-details {
+  display: flex;
+  align-items: center;
+  gap: 3px;
   color: oklch(0.705 0.015 286.067);
 }
 
-.right-details .eye-span {
+.users-right-details .users-eye-span {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -157,13 +176,13 @@
   transition: 0.20s;
 }
 
-.right-details .eye-span:hover {
+.users-right-details .users-eye-span:hover {
   color: oklch(0.623 0.214 259.815);
   background-color: oklch(0.97 0.014 254.604);
 }
 
-.right-details .x-span,
-.right-details .y-span{
+.users-right-details .x-span,
+.users-right-details .y-span {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -176,12 +195,12 @@
 
 
 
-.right-details .x-span:hover {
+.users-right-details .x-span:hover {
   background-color: oklch(0.971 0.013 17.38);
   color: oklch(0.637 0.237 25.331);
 }
 
-.right-details .y-span:hover{
+.users-right-details .y-span:hover {
   background-color: oklch(0.979 0.021 166.113);
   color: oklch(0.596 0.145 163.225);
 }
@@ -190,7 +209,7 @@
 
 
 @media(max-width: 1470px) {
-  .joined-users {
+  .users-joined-users {
     white-space: nowrap;
   }
 
@@ -206,10 +225,17 @@
   .mid-head {
     margin-right: 25px;
   }
-  .right-head{
+
+  .users-mid-details{
+    margin-right: 30px !important;
+    gap: 130px;
+  }
+
+  .right-head {
     display: none;
   }
-  .right-details{
+
+  .users-right-details {
     display: none;
   }
 }
@@ -221,49 +247,55 @@
   }
 
 
-  .status-users{
+  .status-users {
     display: none;
   }
-  .status-users-active{
-    display: none !important;
-  }
-  .status-users-suspended{
+
+  .status-users-active {
     display: none !important;
   }
 
-.mid-details{
-  margin-right: 50px;
-}
+  .status-users-suspended {
+    display: none !important;
+  }
+
+  .users-mid-details {
+    margin-right: 50px;
+  }
 }
 
 
 @media(max-width: 764px) {
 
-  .course-users{
+  .course-users {
     display: none;
   }
 
-  .courses-users{
+  .users-courses-users {
     display: none !important;
   }
 
-  .mid-details{
-  margin-right: 10px;
-}
+  .users-mid-details {
+    margin-right: 0px !important;
+  }
 
 }
 
 @media(max-width: 600px) {
 
+  .users-joined-users {
+    display: none !important;
+  }
+
+  .users-mid-details .users-joined-users {
+    display: none;
+  }
   .joined-users{
     display: none;
   }
-  .mid-details .joined-users{
-    display: none;
-  }
 
-  .mid-details{
-  margin-right: 10px;
-}
+  .users-mid-details {
+    margin-right: 10px;
+  }
 
 }

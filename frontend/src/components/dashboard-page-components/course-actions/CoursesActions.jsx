@@ -135,19 +135,19 @@ function CoursesActions() {
             recentCoursesActions.map((courseAction, i) => {
               return (
                 <div key={i} className="course-details">
-                  <div className="left-details">
+                  <div className="left-details-dash">
                     <img src={courseAction.img} alt="" />
                     <div className='title-inst-course'>
                       <p className="title-course">{courseAction.title}</p>
                       <span className="inst-course">{courseAction.instructor}</span>
                     </div>
                   </div>
-                  <div className='mid-details'>
+                  <div className='mid-details-dash'>
                     <span className={selectClassCategory(courseAction.category)}>{courseAction.category}</span>
                     <span className="hide-students">{courseAction.students}</span>
                     <span>${courseAction.price}</span>
                   </div>
-                  <div className="right-details">
+                  <div className="right-details-dash">
                     <span
                       onClick={() => { handleEdit(courseAction) }}
                       className="edit-course">

@@ -87,17 +87,17 @@ function UsersComponent() {
   return (
     <section>
 
-      <div className='top-part'>
+      <div className='users-top-part'>
         <div className="search-div">
           <CiSearch />
           <input type="text" placeholder="Search users…" />
         </div>
       </div>
 
-      <div className="bottom-part">
-        <div className="grid-users">
+      <div className="users-bottom-part">
+        <div className="users-grid-users">
 
-          <div className="users-head">
+          <div className="users-users-head">
             <div className="left-header">
               USER
             </div>
@@ -119,29 +119,29 @@ function UsersComponent() {
           {
             users.map((userDetails) => {
               return (
-                <div key={userDetails.id} className="user-details">
-                  <div className="left-details">
-                    <div className="letter-div">
+                <div key={userDetails.id} className="users-user-details">
+                  <div className="users-left-details">
+                    <div className="users-letter-div">
                       {userDetails.fLetter}
                     </div>
-                    <div className="user-name-email">
-                      <span className="name-users">{userDetails.name}</span>
-                      <span className="email-users">{userDetails.email}</span>
+                    <div className="users-user-name-email">
+                      <span className="users-name-users">{userDetails.name}</span>
+                      <span className="users-email-users">{userDetails.email}</span>
                     </div>
 
                   </div>
 
-                  <div className="mid-details">
-                    <span className="joined-users">{userDetails.joined}</span>
-                    <span className="courses-users">{userDetails.courses}</span>
+                  <div className="users-mid-details">
+                    <span className="users-joined-users">{userDetails.joined}</span>
+                    <span className="users-courses-users">{userDetails.courses}</span>
                     <span
                       className={userDetails.status === 'active' ? 'status-users-active' : 'status-users-suspended'}>
                       {userDetails.status}</span>
                   </div>
 
 
-                  <div className="right-details">
-                    <span className="eye-span">
+                  <div className="users-right-details">
+                    <span className="users-eye-span">
                       <MdOutlineRemoveRedEye />
                     </span>
                     <span  

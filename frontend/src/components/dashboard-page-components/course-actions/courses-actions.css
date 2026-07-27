@@ -46,7 +46,7 @@
   border: none;
 }
 
-.left-details {
+.left-details-dash {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -54,14 +54,14 @@
   min-width: 0;
 }
 
-.left-details img {
+.left-details-dash img {
   width: 43px;
   height: 43px;
   object-fit: cover;
   border-radius: 10px;
 }
 
-.left-details .title-course {
+.left-details-dash .title-course {
   font-weight: 500;
   font-family: Arial, Helvetica, sans-serif;
   width: 210px;
@@ -71,32 +71,32 @@
   min-width: 0;
 }
 
-.left-details .inst-course {
+.left-details-dash .inst-course {
   color: oklch(0.705 0.015 286.067);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
 }
 
-.mid-details {
+.mid-details-dash {
   display: flex;
   align-items: center;
   gap: 120px;
 }
 
-.mid-details span {
+.mid-details-dash span {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 
-.right-details {
+.right-details-dash {
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.right-details .edit-course {
+.right-details-dash .edit-course {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,12 +106,12 @@
   transition: 0.20s;
 }
 
-.right-details .edit-course:hover {
+.right-details-dash .edit-course:hover {
   color: oklch(0.541 0.281 293.009);
   background-color: oklch(0.969 0.016 293.756);
 }
 
-.right-details .delete-course {
+.right-details-dash .delete-course {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,7 +121,7 @@
   transition: 0.20s;
 }
 
-.right-details .delete-course:hover {
+.right-details-dash .delete-course:hover {
   color: oklch(0.637 0.237 25.331);
   background-color: oklch(0.971 0.013 17.38);
 }
@@ -184,7 +184,7 @@
     margin-left: 90px;
   }
 
-  .left-details {
+  .left-details-dash {
     width: 150px;
   }
 
