@@ -1,0 +1,31 @@
+.categories-div{
+  margin-top: 50px;
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+}
+.category{
+  border: 1px solid rgb(224, 222, 222);
+  padding: 5px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  color: oklch(0.442 0.017 285.786);
+  white-space: nowrap;
+  transition: 0.15s;
+}
+
+.category:hover{
+  border: 1px solid oklab(0.54132 0.0964073 -0.226955 / 0.5);
+}
+
+.category-active{
+  background-color: oklch(0.541 0.281 293.009);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+
+

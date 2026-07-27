@@ -1,0 +1,145 @@
+.side-content {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  width: 220px;
+  background-color: oklch(0.21 0.006 285.885);
+  padding: 10px 10px 20px 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+}
+
+.flex-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.logo-title-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgb(45, 45, 45);
+}
+
+.logo-title-menu svg {
+  color: oklch(0.552 0.016 285.938);
+}
+.logo-title-menu svg:hover{
+  color: white;
+}
+
+.logo-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo-title .logo-side {
+  display: flex;
+  align-items: center;
+  background-color: oklch(0.541 0.281 293.009);
+  padding: 6px 8px;
+  border-radius: 100px;
+}
+
+.logo-title .logo-side svg {
+  color: white;
+}
+
+.logo-title .title-side {
+  color: white;
+  font-weight: 550;
+}
+
+
+.admin-panel {
+  padding: 10px;
+  padding-top: 0px;
+  padding-bottom: 15px;
+  color: oklch(0.552 0.016 285.938);
+  font-size: 12PX;
+  border-bottom: 1PX solid rgb(45, 45, 45);
+}
+
+
+.dashboard-side,
+.courses-side,
+.users-side {
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: oklch(0.705 0.015 286.067);
+  padding: 10px 15px;
+  border-radius: 13px;
+  margin-top: 5px;
+  font-size: 18px;
+  transition: 0.15s;
+  cursor: pointer;
+}
+
+.dashboard-side:hover,
+.courses-side:hover,
+.users-side:hover,
+.setting:hover {
+  background-color: oklch(0.274 0.006 286.033);
+  color: white;
+}
+
+
+
+.selected {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  gap: 10px;
+  color: white;
+  background-color: oklch(0.541 0.281 293.009);
+  padding: 10px 15px;
+  border-radius: 13px;
+  margin-top: 5px;
+  cursor: pointer;
+} 
+
+
+.logout-setting {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  padding-left: 5px;
+  gap: 10px;
+  border-top: 1px solid rgb(45, 45, 45);
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 13px;
+  color: oklch(0.705 0.015 286.067);
+  cursor: pointer;
+}
+
+.logout-side {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 13px;
+  color: oklch(0.704 0.191 22.216);
+  cursor: pointer;
+}
+
+.logout-side:hover {
+  color: oklch(0.808 0.114 19.571);
+  background-color: oklab(0.637 0.214213 0.1014 / 0.1);
+}

@@ -70,11 +70,28 @@ useEffect(() => {
     setAccessToken(token);
   }
 
-  function logout(){
-    console.log('loged out');
-    
+async  function logout(){
+     try {
+      await axios.post(
+        "/api/auth/logout/",
+        {},{
+         headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        
+          withCredentials: true,
+        }
+      );
+    }catch(error){
+      console.log(error);
+      
+    } finally {
     setUser(null);
-     setAccessToken(null);
+    setAccessToken(null);
+      
+    }
+    
+
   }
 
 

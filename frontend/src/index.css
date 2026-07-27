@@ -8,3 +8,8 @@ input {
   border: none;
   outline: none;
 }
+
+.contain{
+  width: 80%;
+  margin: 5px auto;
+}

@@ -1,18 +1,17 @@
 import { Routes, Route } from "react-router-dom";
-import AuthPage from './pages/AuthPage'
-import Dashboard from "./pages/Dashboard";
+import AuthPage from './pages/auth-page/AuthPage';
+import Dashboard from "./pages/dashboard-page/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoutes";
-import Navbar from "./components/Navbar";
 import './App.css'
 import ProfilePage from "./pages/ProfilePage";
+import CoursesPage from "./pages/courses-page/CoursesPage";
+import CourseDetails from "./pages/course-details-page/CourseDetails";
+import MyCourses from "./pages/my-courses-page/MyCourses";
 
 function App() {
 
   return (
 <>
-<ProtectedRoute>
-<Navbar />
-</ProtectedRoute>
 
  <Routes>
   <Route path="/auth" element={<AuthPage />}/>
@@ -32,6 +31,11 @@ function App() {
             </ProtectedRoute>
         }
     />
+
+    <Route path='/courses' element={<CoursesPage />} />
+    <Route path="/course/details" element={<CourseDetails />} />
+
+    <Route path="/my/courses" element={<MyCourses />} />
  </Routes>
  </>
   )

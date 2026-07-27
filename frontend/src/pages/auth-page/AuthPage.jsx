@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import { IoBookOutline } from "react-icons/io5";
 import { MdOutlineEmail } from "react-icons/md";
 import { FiKey } from "react-icons/fi";

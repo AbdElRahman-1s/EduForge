@@ -1,0 +1,12 @@
+.dashboard-container-big{
+  padding-left: 220px;
+}
+.dashboard-container-sm{
+  padding-left: 70px;
+}
+.dashboard-body{
+  padding-top: 70px;
+  background-color: oklch(0.985 0 0);
+  color: rgb(13, 13, 26);
+  height: 100vh;
+}
