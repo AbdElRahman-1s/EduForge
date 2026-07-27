@@ -6,6 +6,7 @@ import './App.css'
 import ProfilePage from "./pages/ProfilePage";
 import CoursesPage from "./pages/courses-page/CoursesPage";
 import CourseDetails from "./pages/course-details-page/CourseDetails";
+import MyCourses from "./pages/my-courses-page/MyCourses";
 
 function App() {
 
@@ -33,6 +34,8 @@ function App() {
 
     <Route path='/courses' element={<CoursesPage />} />
     <Route path="/course/details" element={<CourseDetails />} />
+
+    <Route path="/my/courses" element={<MyCourses />} />
  </Routes>
  </>
   )
