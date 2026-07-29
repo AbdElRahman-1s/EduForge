@@ -1,3 +1,8 @@
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
+
+
 import { IoBookOutline } from "react-icons/io5";
 import { LuLayoutDashboard, LuUserCheck } from "react-icons/lu";
 import { TiFolderOpen } from "react-icons/ti";
@@ -11,7 +16,14 @@ import './sidebar-sm.css'
 function Sidebar({ switchSidebar, setSwitchSidebar , selected , setSelected}) {
 
 
+  
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
+  function handleLogout() {
+    logout();
+    navigate('/auth')
+  }
   
 
 
@@ -64,7 +76,9 @@ function Sidebar({ switchSidebar, setSwitchSidebar , selected , setSelected}) {
               <span>Settings</span>
             </div>
 
-            <div className="logout-side">
+            <div
+              onClick={handleLogout}
+             className="logout-side">
               <GoSignOut />
               <span>Sign out</span>
             </div>
@@ -107,7 +121,9 @@ function Sidebar({ switchSidebar, setSwitchSidebar , selected , setSelected}) {
             <MdOutlineSettings />
           </div>
 
-          <div className="logout-side-sm">
+          <div
+           onClick={handleLogout}
+           className="logout-side-sm">
             <GoSignOut />
           </div>
 
