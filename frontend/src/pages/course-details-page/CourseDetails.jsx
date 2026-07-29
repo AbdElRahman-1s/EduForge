@@ -14,7 +14,43 @@ import { LuCircleCheckBig } from "react-icons/lu";
 
 import './course-details.css';
 
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+
+
+
+
 function CourseDetails() {
+  const [courseDetails , setCourseDetails] = useState();
+
+  const {id} = useParams();
+
+  useEffect(() => {
+    async function fetchCourseDetails() {
+      try{
+      const response = await axios.get(` /api/courses/${id}/`);
+
+      
+      setCourseDetails(response.data);
+      console.log(response.data);
+      
+    }catch(error){
+      console.log(error);
+    }
+
+    }
+
+    fetchCourseDetails();
+    
+
+  },[id])
+
+
+  if(!courseDetails) return <h1>loading</h1>
+
+
   return (
     <>
       <Navbar />
@@ -34,9 +70,9 @@ function CourseDetails() {
                 .
                 <span className="category-details">Hot</span>
               </div>
-              <h1 className="title-details">Machine Learning with Python A–Z</h1>
+              <h1 className="title-details">{courseDetails.title}</h1>
 
-              <p className="desc-details">From fundamentals to deploying ML models in production. Covers scikit-learn, TensorFlow, and PyTorch.</p>
+              <p className="desc-details">{courseDetails.description}</p>
               <div className="more-details">
                 <div className="rating-div">
                   <span className="stars-rating">

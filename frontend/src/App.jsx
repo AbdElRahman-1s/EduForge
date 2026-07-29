@@ -32,10 +32,10 @@ function App() {
         }
     />
 
-    <Route path='/courses' element={<CoursesPage />} />
-    <Route path="/course/details" element={<CourseDetails />} />
+    <Route path='/courses' element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
+    <Route path="/course/details/:id" element={<ProtectedRoute><CourseDetails /></ProtectedRoute>} />
 
-    <Route path="/my/courses" element={<MyCourses />} />
+    <Route path="/my/courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
  </Routes>
  </>
   )
