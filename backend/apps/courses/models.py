@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
+from django.db.models import Q
 from django.db.models.functions import Lower, Trim
 
 # Create your models here.
@@ -8,7 +9,7 @@ from django.db.models.functions import Lower, Trim
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, null=True, blank=True)
 
     class Meta:
         constraints = [
@@ -28,6 +29,12 @@ class Category(models.Model):
 
 
 class Course(models.Model):
+    class CourseLevel(models.TextChoices):
+        BEGINNER = "beginner", "Beginner"
+        INTERMEDIATE = "intermediate", "Intermediate"
+        ADVANCED = "advanced", "Advanced"
+        ALL = "all", "All Levels"
+
     title = models.CharField(max_length=150)
     description = models.TextField()
     instructor = models.ForeignKey(
@@ -37,6 +44,9 @@ class Course(models.Model):
         Category, on_delete=models.PROTECT, related_name="courses"
     )
 
+    price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    level = models.CharField(max_length=15, choices=CourseLevel.choices)
+    thumbnail = models.ImageField(upload_to="courses/", null=True, blank=True)
     published = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -44,3 +54,10 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(price__gte=0), name="price_must_be_non_negative"
+            )
+        ]
