@@ -9,7 +9,7 @@ from django.db.models.functions import Lower, Trim
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, null=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True)
 
     class Meta:
         constraints = [
@@ -28,12 +28,38 @@ class Category(models.Model):
         return super().save(*args, **kwargs)
 
 
+class Topic(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                Lower(Trim("name")), name="unique_lower_trimmed_topic_name"
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
+
 class Course(models.Model):
     class CourseLevel(models.TextChoices):
         BEGINNER = "beginner", "Beginner"
         INTERMEDIATE = "intermediate", "Intermediate"
         ADVANCED = "advanced", "Advanced"
         ALL = "all", "All Levels"
+
+    class Badge(models.TextChoices):
+        BESTSELLER = "bestseller", "Bestseller"
+        HOT = "hot", "Hot"
+        NEW = "new", "New"
+        NONE = "none", "None"
 
     title = models.CharField(max_length=150)
     description = models.TextField()
@@ -47,6 +73,8 @@ class Course(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     level = models.CharField(max_length=15, choices=CourseLevel.choices)
     thumbnail = models.ImageField(upload_to="courses/", null=True, blank=True)
+    topics = models.ManyToManyField(Topic, related_name="courses")
+    badge = models.CharField(max_length=10, choices=Badge.choices, default=Badge.NONE)
     published = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
