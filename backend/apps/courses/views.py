@@ -59,3 +59,15 @@ class InstructorCourseListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Course.objects.filter(instructor=self.request.user)
+
+
+class CategoryView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated, IsInstructor]
+
+
+class TopicView(generics.ListAPIView):
+    queryset = Topic.objects.all()
+    serializer_class = TopicSerializer
+    permission_classes = [IsAuthenticated, IsInstructor]

@@ -1,6 +1,6 @@
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from rest_framework import serializers
-from .models import Course
+from .models import Course, Topic, Category
 from apps.accounts.models import User
 
 
@@ -96,3 +96,19 @@ class CourseDetailSerializer(CourseListSerializer):
 
 class InstructorCourseSerializer(CourseListSerializer):
     pass
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "name",
+            "slug",
+        ]
+
+
+class TopicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ["id", "name", "slug"]
