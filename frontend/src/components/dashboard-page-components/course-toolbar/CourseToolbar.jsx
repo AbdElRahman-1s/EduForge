@@ -1,16 +1,58 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FiPlusCircle } from "react-icons/fi";
 import { IoIosSearch , IoMdClose} from "react-icons/io";
 import { AiOutlinePicture } from "react-icons/ai";
 import { LiaFileVideo } from "react-icons/lia";
 
 import './course-toolbar.css';
+import axios from "axios";
+import { AuthContext } from "../../../context/AuthContext";
 function CourseToolbar() {
 
+  const {accessToken} = useContext(AuthContext);
+
+  async function postAddCourse(){
+    try{
+
+      setDisabeldEffect(true);
+
+    const response = await axios.post('/api/courses/',
+      {
+        title,
+        description
+      },
+      {
+       headers:{
+        Authorization: `Bearer ${accessToken}`
+       },
+        withCredentials:true,
+       
+      }
+    );
+
+    
+    setAddedCourseDetails(response.data);
+    console.log(response.data);
+    
+
+    }catch(error){
+      console.log(error);
+      
+    }finally{
+      setDisabeldEffect(false);
+    }
+
+  }
+
+
+
   const [addCourse, setAddCourse] = useState(false);
+  const [addedCourseDetails , setAddedCourseDetails] = useState({});
+  const [title , setTitle] = useState("");
+  const [description , setDescription] = useState("");
   const [categorySelect, setCategorySelect] = useState("");
   const [levelSelect, setLevelSelect] = useState("");
-
+  const [disabeldEffect,setDisabeldEffect] = useState(false);
   return (
 
     <section>
@@ -39,7 +81,9 @@ function CourseToolbar() {
                   </div>
                   <div className="title-div">
                     <label>Course Title</label>
-                    <input type="text" placeholder="Complete React Bootcamp" />
+                    <input
+                     onChange={(e) => {setTitle(e.target.value)}}
+                     type="text" placeholder="Complete React Bootcamp" />
                   </div>
                   <div className="ins-div">
                     <label>Instructor Name</label>
@@ -77,6 +121,7 @@ function CourseToolbar() {
                   <div className="desc-div">
                     <label>Description</label>
                     <textarea
+                    onChange={(e) => {setDescription(e.target.value)}}
                     className="area-desc" 
                     placeholder="Brief course description"></textarea>
                   </div>
@@ -95,7 +140,10 @@ function CourseToolbar() {
                      onClick={() => { setAddCourse(false) }}>
                       Cancel
                     </button>
-                    <button className="add-new-btn">
+                    <button
+                    disabled={disabeldEffect}
+                    onClick={postAddCourse}
+                     className="add-new-btn">
                       Add Course
                     </button>
                   </div>
