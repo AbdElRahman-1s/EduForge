@@ -17,7 +17,7 @@
 .course-cards {
   width: 100%;
   display: grid;
-  grid-template-columns:  repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 25px;
 }
 
@@ -250,13 +250,82 @@
 } */
 
 
+.next-prev-div {
+  margin-top: 50px;
+  padding: 15px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 30px;
+  border-top: 1px solid rgb(238, 238, 238);
+  border-bottom: 1px solid rgb(238, 238, 238);
+}
+
+.next-prev-div button {
+  background-color: oklch(0.541 0.281 293.009);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.next-prev-div button:disabled {
+  cursor: not-allowed;
+}
+
+.next-prev-div button:hover {
+  background-color: oklch(57.342% 0.26573 295.48);
+}
+
+.next-prev-div button:active {
+  scale: 0.95;
+}
+
+.num-switch-pages-div {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.num-switch-pages-div .active-num {
+  background-color: oklch(0.541 0.281 293.009);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.num-switch-pages-div .off-num {
+  padding: 8px 16px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ede9fe;
+  color: black;
+  cursor: pointer;
+}
+
+.num-switch-pages-div .off-num:hover {
+  background-color: oklch(0.541 0.281 293.009);
+  color: white;
+}
+
+
 
 @media (max-width: 1024px) {
 
   .course-cards {
     width: 100%;
     display: grid;
-    grid-template-columns:  repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
 
@@ -267,7 +336,8 @@
     border-top-right-radius: 15px;
     position: relative;
   }
-  .course-cards .course-card{
+
+  .course-cards .course-card {
     margin-bottom: 30px;
   }
 
@@ -281,7 +351,7 @@
 
   .course-cards {
     display: grid;
-    grid-template-columns:  repeat(1, minmax(0, 1fr));
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
 
@@ -292,4 +362,9 @@
     border-top-right-radius: 15px;
     position: relative;
   }
+}
+
+.link {
+  all: unset;
+  cursor: pointer;
 }

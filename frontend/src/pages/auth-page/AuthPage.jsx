@@ -75,8 +75,13 @@ function AuthPage() {
 
     login(response.data.user, response.data.access);
 
-
-    navigate("/dashboard");
+    if(response.data.user.role === 'student'){
+      navigate("/courses");
+    }
+    else{
+      navigate("/dashboard");
+    }
+    
   }
 
 

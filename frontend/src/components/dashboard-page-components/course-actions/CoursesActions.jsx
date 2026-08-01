@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { LuPenLine } from "react-icons/lu";
 import { FaRegTrashCan } from "react-icons/fa6";
 
@@ -9,92 +9,208 @@ import { AiOutlinePicture } from "react-icons/ai";
 import { LiaFileVideo } from "react-icons/lia";
 
 import './courses-actions.css';
+import axios from "axios";
+import { AuthContext } from "../../../context/AuthContext";
 
 
 
-const recentCoursesActions = [
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    category: 'Bestseller',
-    students: '48,200',
-    price: 89,
-    courseCategory: 'development',
-    courseLevel: 'beginner',
-    courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    category: 'Bestseller',
-    students: '48,200',
-    price: 89,
-    courseCategory: 'development',
-    courseLevel: 'beginner',
-    courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    category: 'New',
-    students: '48,200',
-    price: 89,
-    courseCategory: 'development',
-    courseLevel: 'beginner',
-    courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    category: 'Bestseller',
-    students: '48,200',
-    price: 89,
-    courseCategory: 'development',
-    courseLevel: 'beginner',
-    courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    category: 'Hot',
-    students: '48,200',
-    price: 89,
-    courseCategory: 'development',
-    courseLevel: 'beginner',
-    courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    category: 'Bestseller',
-    students: '48,200',
-    price: 89,
-    courseCategory: 'development',
-    courseLevel: 'beginner',
-    courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.frfr'
-  },
+// const recentCoursesActions = [
+//   {
+//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
+//     title: 'Complete React & Next.js Development',
+//     instructor: 'Marcus Reid',
+//     category: 'Bestseller',
+//     students: '48,200',
+//     price: 89,
+//     courseCategory: 'development',
+//     courseLevel: 'beginner',
+//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
+//   },
+//   {
+//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
+//     title: 'Complete React & Next.js Development',
+//     instructor: 'Marcus Reid',
+//     category: 'Bestseller',
+//     students: '48,200',
+//     price: 89,
+//     courseCategory: 'development',
+//     courseLevel: 'beginner',
+//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
+//   },
+//   {
+//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
+//     title: 'Complete React & Next.js Development',
+//     instructor: 'Marcus Reid',
+//     category: 'New',
+//     students: '48,200',
+//     price: 89,
+//     courseCategory: 'development',
+//     courseLevel: 'beginner',
+//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
+//   },
+//   {
+//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
+//     title: 'Complete React & Next.js Development',
+//     instructor: 'Marcus Reid',
+//     category: 'Bestseller',
+//     students: '48,200',
+//     price: 89,
+//     courseCategory: 'development',
+//     courseLevel: 'beginner',
+//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
+//   },
+//   {
+//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
+//     title: 'Complete React & Next.js Development',
+//     instructor: 'Marcus Reid',
+//     category: 'Hot',
+//     students: '48,200',
+//     price: 89,
+//     courseCategory: 'development',
+//     courseLevel: 'beginner',
+//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
+//   },
+//   {
+//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
+//     title: 'Complete React & Next.js Development',
+//     instructor: 'Marcus Reid',
+//     category: 'Bestseller',
+//     students: '48,200',
+//     price: 89,
+//     courseCategory: 'development',
+//     courseLevel: 'beginner',
+//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.frfr'
+//   },
 
- 
 
-]
+
+// ]
 
 
 function CoursesActions() {
+
+
+  const { accessToken } = useContext(AuthContext);
+
 
   const [isEdit, setISEdit] = useState(false);
   const [selectedCourseEdit, setSelectedCourseEdit] = useState(null);
 
   const [categorySelectEdit, setCategorySelectEdit] = useState("");
   const [levelSelectEdit, setLevelSelectEdit] = useState("");
+  const [mineCourseResults, setmineCourseResults] = useState({
+    results: [],
+  });
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [published, setPublished] = useState(false);
+  const [disabledToggle, setDisabledToggle] = useState(false);
+
+
+  useEffect(() => {
+
+    async function fetchInsmineCourseResults() {
+
+      try {
+        const response = await axios.get('/api/courses/mine/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        );
+
+        setmineCourseResults(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.log(error);
+
+      }
+
+
+    }
+
+    fetchInsmineCourseResults();
+
+  }, [accessToken]);
+
+
+  async function patchEditCourse() {
+
+    try {
+
+      setDisabledToggle(true);
+
+      const response = await axios.patch(`/api/courses/${selectedCourseEdit.id}/`,
+        {
+          title,
+          description,
+          published
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      )
+
+      console.log(response.data);
+
+      setmineCourseResults((prev) => ({
+        ...prev,
+        results: prev.results.map((course) =>
+          course.id === response.data.id ? response.data : course
+        ),
+      }));
+
+    } catch (error) {
+      console.log(error.response.status);
+      console.log(error.response.data);
+
+    } finally {
+      setDisabledToggle(false);
+    }
+
+
+  }
+
+
+  async function deleteCourse(id) {
+
+    try {
+
+      setDisabledToggle(true);
+
+      const response = await axios.delete(`/api/courses/${id}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
+
+      console.log(response.status);
+
+      setmineCourseResults((prev) => ({
+        ...prev,
+        results: prev.results.filter((course) => course.id !== id),
+      }));
+
+    } catch (error) {
+      console.log(error);
+
+    } finally {
+      setDisabledToggle(false);
+    }
+
+  }
+
+
 
   function handleEdit(course) {
     setSelectedCourseEdit(course);
+    setPublished(course.published);
     setISEdit(true);
   }
 
@@ -109,6 +225,13 @@ function CoursesActions() {
     return categoryClasses[categoryName] || "new-category";
   }
 
+
+  useEffect(() => {
+  if (selectedCourseEdit) {
+    setDescription(selectedCourseEdit.description);
+    setTitle(selectedCourseEdit.title);
+  }
+}, [selectedCourseEdit]);
 
 
 
@@ -132,29 +255,32 @@ function CoursesActions() {
           </div>
 
           {
-            recentCoursesActions.map((courseAction, i) => {
+            mineCourseResults.results.map((mineCourseResult) => {
               return (
-                <div key={i} className="course-details">
+                <div key={mineCourseResult.id} className="course-details">
                   <div className="left-details-dash">
-                    <img src={courseAction.img} alt="" />
+                    <img src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format' alt="" />
                     <div className='title-inst-course'>
-                      <p className="title-course">{courseAction.title}</p>
-                      <span className="inst-course">{courseAction.instructor}</span>
+                      <p className="title-course">{mineCourseResult.title}</p>
+                      <span className="inst-course">Marcus Reid</span>
                     </div>
                   </div>
                   <div className='mid-details-dash'>
-                    <span className={selectClassCategory(courseAction.category)}>{courseAction.category}</span>
-                    <span className="hide-students">{courseAction.students}</span>
-                    <span>${courseAction.price}</span>
+                    <span className={selectClassCategory('Bestseller')}>Bestseller</span>
+                    <span className="hide-students">48,200</span>
+                    <span>$89</span>
                   </div>
                   <div className="right-details-dash">
                     <span
-                      onClick={() => { handleEdit(courseAction) }}
+                      onClick={() => { handleEdit(mineCourseResult) }}
                       className="edit-course">
                       <LuPenLine />
                     </span>
 
-                    <span className="delete-course"><FaRegTrashCan /></span>
+                    <span
+                      disabled={disabledToggle}
+                      onClick={() => deleteCourse(mineCourseResult.id)}
+                      className="delete-course"><FaRegTrashCan /></span>
                   </div>
                 </div>
               )
@@ -175,14 +301,15 @@ function CoursesActions() {
                   <div className="title-div">
                     <label>Course Title</label>
                     <input
-                     defaultValue={selectedCourseEdit?.title}
-                     type="text" placeholder="Complete React Bootcamp" />
+                      Value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      type="text" placeholder="Complete React Bootcamp" />
                   </div>
                   <div className="ins-div">
                     <label>Instructor Name</label>
                     <input
-                    defaultValue={selectedCourseEdit?.instructor} 
-                    type="text" placeholder="Marcus Reid" />
+                      defaultValue={selectedCourseEdit?.instructor}
+                      type="text" placeholder="Marcus Reid" />
                   </div>
                   <div className="category-level-div">
                     <select
@@ -211,14 +338,15 @@ function CoursesActions() {
                   <div className="price-div">
                     <label>Price(USD)</label>
                     <input
-                    defaultValue={selectedCourseEdit?.price}
-                     type="number" placeholder="89" />
+                      defaultValue={selectedCourseEdit?.price}
+                      type="number" placeholder="89" />
                   </div>
 
                   <div className="desc-div">
                     <label>Description</label>
                     <textarea
-                      defaultValue={selectedCourseEdit?.courseDesc}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                       className="area-desc"
                       placeholder="Brief course description"></textarea>
                   </div>
@@ -230,15 +358,18 @@ function CoursesActions() {
                       <LiaFileVideo /> Upload Video/URL
                     </div>
                   </div>
-
+                  <p className="note">note:you need to update every thing to edit course correctly</p>
                   <div className="btns-div">
                     <button
                       className="cancel-btn"
                       onClick={() => { setISEdit(false) }}>
                       Cancel
                     </button>
-                    <button className="add-new-btn">
-                      Add Course
+                    <button
+                      disabled={disabledToggle}
+                      onClick={patchEditCourse}
+                      className="add-new-btn">
+                      Edit Course
                     </button>
                   </div>
                 </div>
