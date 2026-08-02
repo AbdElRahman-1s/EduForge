@@ -96,7 +96,9 @@ import { Link } from 'react-router-dom';
 function CourseSection() {
 
 
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState({
+    results: []
+  });
   const [next, setNext] = useState(null);
   const [previous, setPrevious] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -113,7 +115,7 @@ function CourseSection() {
     try {
       const response = await axios.get(`/api/courses/?page=${page}`);
 
-      setCourses(response.data.results);
+      setCourses(response.data);
       setNext(response.data.next);
       setPrevious(response.data.previous);
       setCurrentPage(page);
@@ -140,16 +142,31 @@ function CourseSection() {
 
 
 
+
+
+    const categoryClasses = {
+    bestseller: "best-category",
+    hot: "hot-category",
+    new: "new-category",
+    none: "none-category"
+  };
+
+  function selectClassCategory(categoryName) {
+    return categoryClasses[categoryName] || "none-category";
+  }
+
+
+
   return (
     <section>
 
       <div className='contain'>
-        <h3 className='num-courses'>All Courses <span>(6)</span></h3>
+        <h3 className='num-courses'>All Courses <span>({courses.count})</span></h3>
 
         <div className='course-cards'>
 
           {
-            courses.map((courseCard) => {
+            courses.results.map((courseCard) => {
               return (
                 <Link
                   key={courseCard.id}
@@ -158,7 +175,7 @@ function CourseSection() {
                   <div key={courseCard.id} className='course-card'>
 
                     <div className="imgs-course">
-                      <img src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format' alt="big course image" />
+                      <img src={courseCard.thumbnail} alt="big course image" />
                       <div className="big-play-abs">
 
                         <div className="play-div">
@@ -168,7 +185,9 @@ function CourseSection() {
 
                       </div>
 
-                      <div className="abs-catch">Bestseller</div>
+                      <div className={selectClassCategory(courseCard.badge)}>
+                        {courseCard.badge}
+                      </div>
 
                       <div className="big-abs-bar">
                         <div className="back-bar">
@@ -186,7 +205,7 @@ function CourseSection() {
 
                     <div className="details-course">
 
-                      <div className="category-div">Development</div>
+                      <div className="category-div">{courseCard.category}</div>
 
 
                       <h3 className="title">{courseCard.title}</h3>
@@ -214,7 +233,7 @@ function CourseSection() {
                           148 Lessons
                         </span>
                         <span>
-                          Beginner
+                          {courseCard.level}
                         </span>
                       </div>
 
@@ -223,7 +242,7 @@ function CourseSection() {
 
                         <div className="price-div">
                           <span className="price">
-                            $89
+                            ${courseCard.price}
                           </span>
 
                         </div>
