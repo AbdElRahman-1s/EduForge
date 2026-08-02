@@ -89,3 +89,52 @@ class Course(models.Model):
                 condition=Q(price__gte=0), name="price_must_be_non_negative"
             )
         ]
+
+
+class Section(models.Model):
+    course = models.ForeignKey(
+        Course, on_delete=models.CASCADE, related_name="sections"
+    )
+    title = models.CharField(max_length=150)
+    order = models.PositiveSmallIntegerField()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["course", "order"], name="unique_section_order_per_course"
+            ),
+            models.CheckConstraint(
+                condition=Q(order__gt=0), name="section_order_greater_than_zero"
+            ),
+        ]
+
+
+class Lesson(models.Model):
+    section = models.ForeignKey(
+        Section, on_delete=models.CASCADE, related_name="lessons"
+    )
+    title = models.CharField(max_length=150)
+    duration_seconds = models.PositiveIntegerField()
+    video = models.URLField()
+    free = models.BooleanField(default=False)
+    order = models.PositiveSmallIntegerField()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["section", "order"], name="unique_lesson_order_per_section"
+            ),
+            models.CheckConstraint(
+                condition=Q(order__gt=0), name="lesson_order_greater_than_zero"
+            ),
+            models.CheckConstraint(
+                condition=Q(duration_seconds__gt=0),
+                name="lesson_duration_greater_than_zero",
+            ),
+        ]
