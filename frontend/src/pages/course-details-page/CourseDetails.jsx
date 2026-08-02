@@ -23,32 +23,48 @@ import axios from "axios";
 
 
 function CourseDetails() {
-  const [courseDetails , setCourseDetails] = useState();
+  const [courseDetails, setCourseDetails] = useState();
 
-  const {id} = useParams();
+  const { id } = useParams();
 
   useEffect(() => {
     async function fetchCourseDetails() {
-      try{
-      const response = await axios.get(` /api/courses/${id}/`);
+      try {
+        const response = await axios.get(` /api/courses/${id}/`);
 
-      
-      setCourseDetails(response.data);
-      console.log(response.data);
-      
-    }catch(error){
-      console.log(error);
-    }
+
+        setCourseDetails(response.data);
+        console.log(response.data);
+
+      } catch (error) {
+        console.log(error);
+      }
 
     }
 
     fetchCourseDetails();
-    
-
-  },[id])
 
 
-  if(!courseDetails) return <h1>loading</h1>
+  }, [id])
+
+
+
+  const categoryClasses = {
+    bestseller: "best-category",
+    hot: "hot-category",
+    new: "new-category",
+    none: "none-category"
+  };
+
+  function selectClassCategory(categoryName) {
+    return categoryClasses[categoryName] || "none-category";
+  }
+
+
+
+
+
+  if (!courseDetails) return <h1>loading</h1>
 
 
   return (
@@ -60,15 +76,15 @@ function CourseDetails() {
           <div className="details-flex">
             <div className="left-details">
               <Link to="/courses">
-              <div className="back-div">
-                <FaArrowLeft />
-                Back to courses
-              </div>
+                <div className="back-div">
+                  <FaArrowLeft />
+                  Back to courses
+                </div>
               </Link>
               <div className="type-category-div">
-                <span className="type-details">Data Science</span>
+                <span className="type-details">{courseDetails.category}</span>
                 .
-                <span className="category-details">Hot</span>
+                <span className={selectClassCategory(courseDetails.badge)}>{courseDetails.badge}</span>
               </div>
               <h1 className="title-details">{courseDetails.title}</h1>
 
@@ -103,20 +119,20 @@ function CourseDetails() {
               <div className="ins-details">
                 <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&auto=format" alt="" />
                 <span className="ins-word">Instructor:</span>
-                <span>Dr. Sarah Chen</span>
+                <span>{courseDetails.instructor.username}</span>
               </div>
             </div>
 
             <div className="right-details">
               <div className="card-details">
                 <div className="img-details">
-                  <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&h=340&fit=crop&auto=format" alt="" />
+                  <img src={courseDetails.thumbnail} alt="" />
                   <span><FaPlay /></span>
                 </div>
                 <div className="bot-content">
-                  <h2 className="price-details">$94</h2>
+                  <h2 className="price-details">${courseDetails.price}</h2>
                   <div className="btns-details">
-                    <button className="purple-btn">Enroll Now - $94</button>
+                    <button className="purple-btn">Enroll Now - ${courseDetails.price}</button>
                     <button className="white-btn">Try free preview</button>
                   </div>
 
@@ -154,16 +170,16 @@ function CourseDetails() {
           </div>
         </div>
       </div>
-    
+
       <div className="course-details-">
         <div className="details-bot-container">
           <div className="details-bot-flex">
 
             <div className="things-in-course">
-              <span>Python</span>
-              <span>TensorFlow</span>
-              <span>PyTorch</span>
-              <span>scikit-learn</span>
+              <span>{courseDetails.topics[0] || 'Topic 1'}</span>
+              <span>{courseDetails.topics[1] || 'Topic 2'}</span>
+              <span>{courseDetails.topics[2] || 'Topic 3'}</span>
+              <span>{courseDetails.topics[3] || 'Topic 4'}</span>
             </div>
 
             <div className="bot-before-enroll-div">
