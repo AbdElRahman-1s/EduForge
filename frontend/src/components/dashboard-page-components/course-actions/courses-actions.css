@@ -27,8 +27,8 @@
 .mid-header {
   display: flex;
   align-items: center;
-  gap: 100px;
-  margin-left: 290px;
+  gap: 140px;
+  margin-left: 250px;
 }
 
 .course-details {
@@ -87,6 +87,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+
+.price-course-api,
+.hide-students{
+  width: 80px;
 }
 
 
@@ -156,6 +162,16 @@
   width: 100px;
 }
 
+.none-category {
+  background-color: black;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  width: 100px;
+}
+
 
 @media(max-width: 1211px) {
   .students-course {
@@ -174,7 +190,8 @@
 
   .new-category,
   .best-category,
-  .hot-category {
+  .hot-category,
+  .none-category {
     display: none !important;
   }
 }
@@ -196,6 +213,15 @@
   }
 }
 
+@media(max-width: 768px) {
+ .price-course{
+  display: none !important;
+ }
+ .price-course-api{
+  display: none !important;
+ }
+}
+
 /*overlay*/
 
 
@@ -208,6 +234,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  pointer-events: auto;
 }
 
 
@@ -218,7 +245,8 @@
   box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
   max-width: 520px;
   max-height: 600px;
-  overflow-y:scroll;
+  overflow-y: scroll;
+  pointer-events: auto;
 }
 
 .modal-content {
@@ -236,7 +264,7 @@
   padding-bottom: 20px;
 }
 
-.top-desc span{
+.top-desc span {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,10 +272,12 @@
   padding: 4px 5px;
   border-radius: 150px;
 }
-.top-desc span:hover{
+
+.top-desc span:hover {
   background-color: oklch(0.967 0.001 286.375);
 }
-.top-desc span svg{
+
+.top-desc span svg {
   color: oklch(0.552 0.016 285.938);
 }
 
@@ -352,7 +382,7 @@
 }
 
 .cancel-btn,
-.add-new-btn{
+.add-new-btn {
   width: 100%;
   padding: 15px 0px;
   border: 1px solid oklch(0.92 0.004 286.32);
@@ -363,29 +393,29 @@
   transition: 0.15s;
 }
 
-.add-new-btn{
+.add-new-btn {
   color: white;
   background-color: oklch(0.541 0.281 293.009);
   font-weight: bold;
   font-size: 16px;
 }
 
-.add-new-btn:hover{
+.add-new-btn:hover {
   background-color: oklch(0.491 0.27 292.581);
 }
 
-.cancel-btn:hover{
+.cancel-btn:hover {
   background-color: oklch(0.985 0 0);
 }
 
 
-.add-new-btn:disabled{
+.add-new-btn:disabled {
   cursor: not-allowed;
   opacity: 0.8;
 }
 
 
-.note{
+.note {
   font-size: 14px;
   margin: 0px auto;
   color: red;

@@ -216,13 +216,14 @@ function CoursesActions() {
 
 
   const categoryClasses = {
-    Bestseller: "best-category",
-    Hot: "hot-category",
-    New: "new-category",
+    bestseller: "best-category",
+    hot: "hot-category",
+    new: "new-category",
+    none: "none-category"
   };
 
   function selectClassCategory(categoryName) {
-    return categoryClasses[categoryName] || "new-category";
+    return categoryClasses[categoryName] || "none-category";
   }
 
 
@@ -262,13 +263,13 @@ function CoursesActions() {
                     <img src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format' alt="" />
                     <div className='title-inst-course'>
                       <p className="title-course">{mineCourseResult.title}</p>
-                      <span className="inst-course">Marcus Reid</span>
+                      <span className="inst-course">{mineCourseResult.instructor.username}</span>
                     </div>
                   </div>
                   <div className='mid-details-dash'>
-                    <span className={selectClassCategory('Bestseller')}>Bestseller</span>
+                    <span className={selectClassCategory(mineCourseResult.badge)}>{mineCourseResult.badge}</span>
                     <span className="hide-students">48,200</span>
-                    <span>$89</span>
+                    <span className="price-course-api">${mineCourseResult.price}</span>
                   </div>
                   <div className="right-details-dash">
                     <span
