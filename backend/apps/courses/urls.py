@@ -5,6 +5,8 @@ from .views import (
     InstructorCourseListView,
     CategoryView,
     TopicView,
+    SectionView,
+    SectionDetailView,
 )
 
 urlpatterns = [
@@ -15,4 +17,14 @@ urlpatterns = [
     ),
     path("categories/", CategoryView.as_view(), name="categories-list"),
     path("topics/", TopicView.as_view(), name="topics-list"),
+    path(
+        "courses/<int:course_id>/sections/",
+        SectionView.as_view(),
+        name="create-section",
+    ),
+    path(
+        "courses/<int:course_id>/sections/<int:section_id>/",
+        SectionDetailView.as_view(),
+        name="section-setail",
+    ),
 ]
