@@ -7,6 +7,8 @@ from .views import (
     TopicView,
     SectionView,
     SectionDetailView,
+    LessonView,
+    LessonDetailView,
 )
 
 urlpatterns = [
@@ -26,5 +28,13 @@ urlpatterns = [
         "courses/<int:course_id>/sections/<int:section_id>/",
         SectionDetailView.as_view(),
         name="section-setail",
+    ),
+    path(
+        "sections/<int:section_id>/lessons/", LessonView.as_view(), name="create-lesson"
+    ),
+    path(
+        "sections/<int:section_id>/lessons/<int:lesson_id>/",
+        LessonDetailView.as_view(),
+        name="lesson-detail",
     ),
 ]

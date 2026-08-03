@@ -10,8 +10,9 @@ from .serializers import (
     CategorySerializer,
     TopicSerializer,
     SectionSerializer,
+    LessonSerializer,
 )
-from .models import Course, Category, Topic, Section
+from .models import Course, Category, Topic, Section, Lesson
 from .permissions import IsInstructor, IsCourseOwner
 
 # Create your views here.
@@ -104,3 +105,30 @@ class SectionDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Section.objects.filter(
             course_id=self.kwargs["course_id"], course__instructor=self.request.user
         ).order_by("order")
+
+
+class LessonView(generics.CreateAPIView):
+    serializer_class = LessonSerializer
+    permission_classes = [IsAuthenticated, IsInstructor]
+
+    def perform_create(self, serializer):
+        section = get_object_or_404(
+            Section, pk=self.kwargs["section_id"], course__instructor=self.request.user
+        )
+        max_order = Lesson.objects.filter(section=section).aggregate(
+            max_order=Max("order")
+        )["max_order"]
+        next_order = (max_order or 0) + 1
+        serializer.save(section=section, order=next_order)
+
+
+class LessonDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = LessonSerializer
+    permission_classes = [IsAuthenticated, IsInstructor]
+    lookup_url_kwarg = "lesson_id"
+
+    def get_queryset(self):
+        section = get_object_or_404(
+            Section, pk=self.kwargs["section_id"], course__instructor=self.request.user
+        )
+        return Lesson.objects.filter(section=section).order_by("order")

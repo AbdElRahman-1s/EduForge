@@ -123,3 +123,17 @@ class SectionSerializer(serializers.ModelSerializer):
             "order",
         ]
         read_only_fields = ["id", "order"]
+
+
+class LessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = [
+            "id",
+            "title",
+            "video",
+            "duration_seconds",
+            "order",
+            "free",
+        ]
+        read_only_fields = ["id", "order"]
