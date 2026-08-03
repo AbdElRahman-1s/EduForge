@@ -91,7 +91,7 @@
 
 
 .price-course-api,
-.hide-students{
+.hide-students {
   width: 80px;
 }
 
@@ -214,12 +214,13 @@
 }
 
 @media(max-width: 768px) {
- .price-course{
-  display: none !important;
- }
- .price-course-api{
-  display: none !important;
- }
+  .price-course {
+    display: none !important;
+  }
+
+  .price-course-api {
+    display: none !important;
+  }
 }
 
 /*overlay*/
@@ -327,7 +328,8 @@
 
 
 .category-select,
-.level-select {
+.level-select,
+.badge-select {
   outline: none;
   background-color: oklch(0.985 0 0);
   border: 1px solid oklch(0.92 0.004 286.32);
@@ -362,6 +364,10 @@
 
 .thumb-div,
 .video-div {
+  width: 220px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   color: oklch(0.705 0.015 286.067);
   border: 1px dashed oklch(0.92 0.004 286.32);
   display: flex;
@@ -419,4 +425,73 @@
   font-size: 14px;
   margin: 0px auto;
   color: red;
+}
+
+
+.publish-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.publish-div label {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  border: 1px solid oklch(0.92 0.004 286.32);
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+
+
+
+.topics-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  max-height: 180px;
+  overflow-y: auto;
+
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+}
+
+.topic-btn {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.topic-btn:hover {
+  border-color: #5b5ce2;
+}
+
+.topic-btn.active {
+  background: #5b5ce2;
+  color: #fff;
+  border-color: #5b5ce2;
+}
+
+.hide-warning {
+  display: none !important;
+}
+.show-warning {
+  display: block;
+  color: red;
+  font-size: 14px;
+}
+
+.show-warning ,
+.hide-warning{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

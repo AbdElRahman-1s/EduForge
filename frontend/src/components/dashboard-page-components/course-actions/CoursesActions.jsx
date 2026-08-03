@@ -101,11 +101,19 @@ function CoursesActions() {
   const [mineCourseResults, setmineCourseResults] = useState({
     results: [],
   });
+  const [fetchCategories, setFetchCategories] = useState([]);
+  const [fetchTopics, setFetchTopics] = useState([]);
+  const [thumbnail, setThumbnail] = useState(null);
+  const [selectedTopics, setSelectedTopics] = useState([]);
+  const [badgeSelect, setBadgeSelect] = useState("");
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [published, setPublished] = useState(false);
   const [disabledToggle, setDisabledToggle] = useState(false);
+  const [price, setPrice] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('hide-warning');
+
 
 
   useEffect(() => {
@@ -125,7 +133,7 @@ function CoursesActions() {
         console.log(response.data);
       } catch (error) {
         console.log(error);
-
+        
       }
 
 
@@ -142,12 +150,31 @@ function CoursesActions() {
 
       setDisabledToggle(true);
 
+
+
+      const formData = new FormData();
+
+
+      formData.append("title", title);
+      selectedTopics.forEach((topicId) => {
+        formData.append("topics", Number(topicId));
+      });
+      formData.append("description", description);
+      formData.append("level", levelSelectEdit);
+      formData.append("category", categorySelectEdit);
+      formData.append("price", price);
+      formData.append("badge", badgeSelect);
+
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
+      }
+      formData.append("published", published);
+
+
+
+
       const response = await axios.patch(`/api/courses/${selectedCourseEdit.id}/`,
-        {
-          title,
-          description,
-          published
-        },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -167,6 +194,9 @@ function CoursesActions() {
     } catch (error) {
       console.log(error.response.status);
       console.log(error.response.data);
+      if (error.response?.data) {
+        setErrorMessage("show-warning");
+      }
 
     } finally {
       setDisabledToggle(false);
@@ -208,11 +238,104 @@ function CoursesActions() {
 
 
 
-  function handleEdit(course) {
-    setSelectedCourseEdit(course);
-    setPublished(course.published);
-    setISEdit(true);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const response = await axios.get(' api/categories/',
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      setFetchCategories(response.data.results);
+      console.log(response.data);
+    }
+    async function fetchTopics() {
+      const response = await axios.get(' api/topics/',
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      setFetchTopics(response.data.results);
+      console.log(response.data);
+
+    }
+    fetchCategories();
+    fetchTopics();
+  }, [accessToken]);
+
+
+
+
+
+
+  async function handleEdit(course) {
+
+    try {
+
+      const response = await axios.get(`/api/courses/${course.id}/`);
+      setSelectedCourseEdit(response.data);
+      console.log(response.data);
+
+
+      const data = response.data;
+
+      setSelectedCourseEdit(data);
+
+      setPublished(data.published);
+      setDescription(data.description);
+      setTitle(data.title);
+      setPrice(data.price);
+      setLevelSelectEdit(data.level);
+      setBadgeSelect(data.badge);
+
+      setSelectedTopics(
+        fetchTopics
+          .filter((fetchTopic) =>
+            data.topics.includes(fetchTopic.name)
+          )
+          .map((fetchTopic) => fetchTopic.id)
+      );
+
+      setCategorySelectEdit(
+        fetchCategories.find(
+          (category) => category.name === data.category
+        )?.id
+      );
+
+      setISEdit(true);
+
+
+    } catch (error) {
+      console.log(error);
+    }
+
+
+
   }
+
+
+
+
+
+
+
+
+  function handleTopicClick(id) {
+    if (selectedTopics.includes(id)) {
+      setSelectedTopics(
+        selectedTopics.filter((topicId) => topicId !== id)
+      );
+    } else {
+      setSelectedTopics([...selectedTopics, id]);
+    }
+  }
+
 
 
   const categoryClasses = {
@@ -226,13 +349,6 @@ function CoursesActions() {
     return categoryClasses[categoryName] || "none-category";
   }
 
-
-  useEffect(() => {
-  if (selectedCourseEdit) {
-    setDescription(selectedCourseEdit.description);
-    setTitle(selectedCourseEdit.title);
-  }
-}, [selectedCourseEdit]);
 
 
 
@@ -260,10 +376,10 @@ function CoursesActions() {
               return (
                 <div key={mineCourseResult.id} className="course-details">
                   <div className="left-details-dash">
-                    <img src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format' alt="" />
+                    <img src={mineCourseResult.thumbnail} alt="" />
                     <div className='title-inst-course'>
                       <p className="title-course">{mineCourseResult.title}</p>
-                      <span className="inst-course">{mineCourseResult.instructor.username}</span>
+                      <span className="inst-course">{mineCourseResult.instructor?.username}</span>
                     </div>
                   </div>
                   <div className='mid-details-dash'>
@@ -302,30 +418,42 @@ function CoursesActions() {
                   <div className="title-div">
                     <label>Course Title</label>
                     <input
-                      Value={title}
+                      value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       type="text" placeholder="Complete React Bootcamp" />
                   </div>
-                  <div className="ins-div">
-                    <label>Instructor Name</label>
-                    <input
-                      defaultValue={selectedCourseEdit?.instructor}
-                      type="text" placeholder="Marcus Reid" />
+                  <div className="topics-div">
+                    <div className="topics-container">
+                      {fetchTopics.map((topic) => (
+                        <button
+                          key={topic.id}
+                          type="button"
+                          className={`topic-btn ${selectedTopics.includes(topic.id) ? "active" : ""
+                            }`}
+                          onClick={() => handleTopicClick(topic.id)}
+                        >
+                          {topic.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div className="category-level-div">
                     <select
-                      defaultValue={selectedCourseEdit?.courseCategory}
+                      value={categorySelectEdit}
                       onChange={(e) => setCategorySelectEdit(e.target.value)}
-                      className="category-select">
+                      className="category-select"
+                    >
                       <option value="">Choose Category</option>
-                      <option value="development">Development</option>
-                      <option value="data science">Data Science</option>
-                      <option value="design">Design</option>
-                      <option value="business">Business</option>
-                      <option value="Marketing">Marketing</option>
+                      {fetchCategories.map((category) => (
+                        <option key={category.id}
+                          value={category.id}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
                     </select>
                     <select
-                      defaultValue={selectedCourseEdit?.courseLevel}
+                      value={levelSelectEdit}
                       onChange={(e) => setLevelSelectEdit(e.target.value)}
                       className="level-select">
                       <option value="">Choose Level</option>
@@ -336,10 +464,24 @@ function CoursesActions() {
                     </select>
                   </div>
 
+                  <div>
+                    <select
+                      value={badgeSelect}
+                      onChange={(e) => setBadgeSelect(e.target.value)}
+                      className="badge-select">
+                      <option value="">Choose Badge</option>
+                      <option value="none">None</option>
+                      <option value="new">New</option>
+                      <option value="hot">Hot</option>
+                      <option value="bestseller">Bestseller</option>
+                    </select>
+                  </div>
+
                   <div className="price-div">
                     <label>Price(USD)</label>
                     <input
-                      defaultValue={selectedCourseEdit?.price}
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
                       type="number" placeholder="89" />
                   </div>
 
@@ -352,14 +494,58 @@ function CoursesActions() {
                       placeholder="Brief course description"></textarea>
                   </div>
                   <div className="big-div-uploads">
-                    <div className="thumb-div">
-                      <AiOutlinePicture /> Upload Thumbnail
-                    </div>
+                    <label
+                      htmlFor="thumbnail"
+                      className="thumb-div">
+                      <AiOutlinePicture />
+                      {
+                        thumbnail
+                          ? thumbnail.name
+                          : selectedCourseEdit?.thumbnail?.split("/").pop()
+                      }
+                    </label>
+                    <input
+                      id="thumbnail"
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        setThumbnail(file);
+                      }}
+                    />
+
                     <div className="video-div">
                       <LiaFileVideo /> Upload Video/URL
                     </div>
                   </div>
-                  <p className="note">note:you need to update every thing to edit course correctly</p>
+
+
+                  <div className="publish-div">
+                    <label>
+                      <input
+                        type="radio"
+                        name="published"
+                        checked={published === false}
+                        onChange={() => setPublished(false)}
+                      />
+                      Draft
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="published"
+                        checked={published === true}
+                        onChange={() => setPublished(true)}
+                      />
+                      Published
+                    </label>
+                  </div>
+
+                  <p
+                    className={errorMessage}
+                  >⚠️ All fields are required. Please do not leave any field empty.</p>
+
                   <div className="btns-div">
                     <button
                       className="cancel-btn"
