@@ -1,5 +1,7 @@
 from django.db.models.aggregates import Max
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .serializers import (
@@ -11,7 +13,10 @@ from .serializers import (
     TopicSerializer,
     SectionSerializer,
     LessonSerializer,
+    SectionReorderSerializer,
+    LessonReorderSerializer,
 )
+from .services import reorder_sections, reorder_lessons
 from .models import Course, Category, Topic, Section, Lesson
 from .permissions import IsInstructor, IsCourseOwner
 
@@ -132,3 +137,40 @@ class LessonDetailView(generics.RetrieveUpdateDestroyAPIView):
             Section, pk=self.kwargs["section_id"], course__instructor=self.request.user
         )
         return Lesson.objects.filter(section=section).order_by("order")
+
+
+class SectionReorderView(APIView):
+    permission_classes = [IsAuthenticated, IsInstructor]
+
+    def patch(self, request, course_id):
+        serializer = SectionReorderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        reorder_sections(
+            course_id=course_id,
+            instructor=request.user,
+            order=serializer.validated_data["order"],
+        )
+        return Response(
+            {"message": "Sections reordered successfully."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class LessonReorderView(APIView):
+    permission_classes = [IsAuthenticated, IsInstructor]
+
+    def patch(self, request, section_id):
+        serializer = LessonReorderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        reorder_lessons(
+            section=get_object_or_404(
+                Section, pk=section_id, course__instructor=request.user
+            ),
+            order=serializer.validated_data["order"],
+        )
+
+        return Response(
+            {"message": "Lessons reordered successfully."}, status=status.HTTP_200_OK
+        )

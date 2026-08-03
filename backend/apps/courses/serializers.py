@@ -137,3 +137,17 @@ class LessonSerializer(serializers.ModelSerializer):
             "free",
         ]
         read_only_fields = ["id", "order"]
+
+
+class SectionReorderSerializer(serializers.Serializer):
+    order = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=False,
+    )
+
+
+class LessonReorderSerializer(serializers.Serializer):
+    order = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=False,
+    )
