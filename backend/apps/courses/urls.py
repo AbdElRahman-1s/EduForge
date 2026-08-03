@@ -5,6 +5,12 @@ from .views import (
     InstructorCourseListView,
     CategoryView,
     TopicView,
+    SectionView,
+    SectionDetailView,
+    LessonView,
+    LessonDetailView,
+    SectionReorderView,
+    LessonReorderView,
 )
 
 urlpatterns = [
@@ -15,4 +21,32 @@ urlpatterns = [
     ),
     path("categories/", CategoryView.as_view(), name="categories-list"),
     path("topics/", TopicView.as_view(), name="topics-list"),
+    path(
+        "courses/<int:course_id>/sections/",
+        SectionView.as_view(),
+        name="create-section",
+    ),
+    path(
+        "courses/<int:course_id>/sections/<int:section_id>/",
+        SectionDetailView.as_view(),
+        name="section-setail",
+    ),
+    path(
+        "sections/<int:section_id>/lessons/", LessonView.as_view(), name="create-lesson"
+    ),
+    path(
+        "sections/<int:section_id>/lessons/<int:lesson_id>/",
+        LessonDetailView.as_view(),
+        name="lesson-detail",
+    ),
+    path(
+        "courses/<int:course_id>/sections/reorder/",
+        SectionReorderView.as_view(),
+        name="reorder-sections",
+    ),
+    path(
+        "sections/<int:section_id>/lessons/reorder/",
+        LessonReorderView.as_view(),
+        name="reorder-lessons",
+    ),
 ]
