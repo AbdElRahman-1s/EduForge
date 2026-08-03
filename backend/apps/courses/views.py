@@ -1,4 +1,5 @@
 from django.db.models.aggregates import Max
+from django.db.models import Q
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -19,8 +20,10 @@ from .serializers import (
 from .services import reorder_sections, reorder_lessons
 from .models import Course, Category, Topic, Section, Lesson
 from .permissions import IsInstructor, IsCourseOwner
+from django.contrib.auth import get_user_model
 
 # Create your views here.
+User = get_user_model()
 
 
 class CourseListCreateView(generics.ListCreateAPIView):
@@ -47,9 +50,15 @@ class CourseListCreateView(generics.ListCreateAPIView):
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
-        if self.request.method == "GET":
-            return Course.objects.filter(published=True)
-        return Course.objects.all()
+        queryset = Course.objects.filter(published=True)
+        if (
+            self.request.user.is_authenticated
+            and self.request.user.role == User.Role.INSTRUCTOR
+        ):
+            queryset = Course.objects.filter(
+                Q(published=True) | Q(instructor=self.request.user)
+            )
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method == "GET":
