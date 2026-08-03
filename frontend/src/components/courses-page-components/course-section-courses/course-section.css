@@ -17,13 +17,16 @@
 .course-cards {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
   gap: 25px;
 }
 
 .course-cards .course-card {
   cursor: pointer;
   transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .course-cards .course-card:hover {
@@ -33,6 +36,7 @@
 
 .course-cards .course-card .imgs-course {
   width: 100%;
+  height: 220px;
   overflow: hidden;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
@@ -91,7 +95,7 @@
 }
 
 
-.course-cards .course-card .imgs-course .abs-catch {
+.course-cards .course-card .imgs-course .best-category {
   font-family: Arial, Helvetica, sans-serif;
   position: absolute;
   top: 20px;
@@ -102,6 +106,45 @@
   border-radius: 15px;
   font-size: 12px;
   font-weight: 560;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.course-cards .course-card .imgs-course .hot-category {
+  font-family: Arial, Helvetica, sans-serif;
+  position: absolute;
+  top: 20px;
+  left: 15px;
+  color: oklch(0.505 0.213 27.518);
+  background-color: oklch(0.936 0.032 17.717);
+  padding: 2px 6px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 560;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.course-cards .course-card .imgs-course .new-category {
+  font-family: Arial, Helvetica, sans-serif;
+  position: absolute;
+  top: 20px;
+  left: 15px;
+  color: oklch(0.491 0.27 292.581);
+  background-color: oklch(0.943 0.029 294.588);
+  padding: 2px 6px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 560;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.course-cards .course-card .imgs-course .none-category {
+  display: none;
 }
 
 .course-cards .course-card .imgs-course .big-abs-bar {
@@ -139,6 +182,10 @@
 
 
 .details-course {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   background-color: white;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
@@ -320,49 +367,8 @@
 
 
 
-@media (max-width: 1024px) {
-
-  .course-cards {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 
 
-  .course-cards .course-card .imgs-course {
-    width: 100%;
-    height: 60%;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    position: relative;
-  }
-
-  .course-cards .course-card {
-    margin-bottom: 30px;
-  }
-
-  .details-course {
-    width: 100%;
-  }
-}
-
-
-@media (max-width: 720px) {
-
-  .course-cards {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-
-
-  .course-cards .course-card .imgs-course {
-    width: 100%;
-    height: 60%;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    position: relative;
-  }
-}
 
 .link {
   all: unset;
