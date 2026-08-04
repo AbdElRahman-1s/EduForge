@@ -16,6 +16,8 @@ from .serializers import (
     LessonSerializer,
     SectionReorderSerializer,
     LessonReorderSerializer,
+    LessonDetailSerializer,
+    SectionDetailSerializer,
 )
 from .services import reorder_sections, reorder_lessons
 from .models import Course, Category, Topic, Section, Lesson

@@ -14,6 +14,32 @@ class InstructorSerializer(serializers.ModelSerializer):
         ]
 
 
+class LessonDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = [
+            "id",
+            "title",
+            "duration_seconds",
+            "order",
+            "free",
+            "video",
+        ]
+
+
+class SectionDetailSerializer(serializers.ModelSerializer):
+    lessons = LessonDetailSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Section
+        fields = [
+            "id",
+            "title",
+            "order",
+            "lessons",
+        ]
+
+
 class CourseSerializer(serializers.ModelSerializer):
     topics = serializers.PrimaryKeyRelatedField(
         required=False, queryset=Topic.objects.all(), many=True
@@ -90,8 +116,10 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 
 class CourseDetailSerializer(CourseListSerializer):
+    sections = SectionDetailSerializer(many=True, read_only=True)
+
     class Meta(CourseListSerializer.Meta):
-        fields = CourseListSerializer.Meta.fields + ["description"]
+        fields = CourseListSerializer.Meta.fields + ["description", "sections"]
 
 
 class InstructorCourseSerializer(CourseListSerializer):

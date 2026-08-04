@@ -102,6 +102,7 @@ class Section(models.Model):
         return self.title
 
     class Meta:
+        ordering = ["order"]
         constraints = [
             models.UniqueConstraint(
                 fields=["course", "order"], name="unique_section_order_per_course"
@@ -126,6 +127,7 @@ class Lesson(models.Model):
         return self.title
 
     class Meta:
+        ordering = ["order"]
         constraints = [
             models.UniqueConstraint(
                 fields=["section", "order"], name="unique_lesson_order_per_section"
