@@ -495,3 +495,18 @@
   align-items: center;
   justify-content: center;
 }
+
+
+
+
+.success-p-hide{
+  display: none;
+}
+
+.success-p{
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  font-size: 15px;
+  color: rgb(43, 255, 43);
+}
