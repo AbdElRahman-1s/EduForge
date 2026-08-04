@@ -106,6 +106,8 @@ function CoursesActions() {
   const [thumbnail, setThumbnail] = useState(null);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [badgeSelect, setBadgeSelect] = useState("");
+  const [successMessage, setSuccessMessage] = useState("success-p-hide");
+
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -133,7 +135,7 @@ function CoursesActions() {
         console.log(response.data);
       } catch (error) {
         console.log(error);
-        
+
       }
 
 
@@ -184,12 +186,17 @@ function CoursesActions() {
 
       console.log(response.data);
 
+      setSuccessMessage("success-p");
+      setTimeout(() => setSuccessMessage("success-p-hide"), 3000);
+
       setmineCourseResults((prev) => ({
         ...prev,
         results: prev.results.map((course) =>
           course.id === response.data.id ? response.data : course
         ),
       }));
+
+
 
     } catch (error) {
       console.log(error.response.status);
@@ -278,7 +285,13 @@ function CoursesActions() {
 
     try {
 
-      const response = await axios.get(`/api/courses/${course.id}/`);
+      const response = await axios.get(`/api/courses/${course.id}/`
+        , {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
       setSelectedCourseEdit(response.data);
       console.log(response.data);
 
@@ -545,6 +558,10 @@ function CoursesActions() {
                   <p
                     className={errorMessage}
                   >⚠️ All fields are required. Please do not leave any field empty.</p>
+
+                  <p className={successMessage}>
+                    Edited
+                  </p>
 
                   <div className="btns-div">
                     <button

@@ -18,7 +18,7 @@ function CourseToolbar() {
   const [fetchCategories, setFetchCategories] = useState([]);
   const [fetchTopics, setFetchTopics] = useState([]);
   const [errorMessage, setErrorMessage] = useState("note-p-hide");
-
+  const [successMessage, setSuccessMessage] = useState("success-p-hide");
 
 
 
@@ -30,7 +30,7 @@ function CourseToolbar() {
   const [levelSelect, setLevelSelect] = useState("");
   const [price, setPrice] = useState("");
   const [published, setPublished] = useState(false);
-  const [badgeSelect, setBadgeSelect] = useState(null);
+  const [badgeSelect, setBadgeSelect] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
 
 
@@ -74,7 +74,8 @@ function CourseToolbar() {
 
       setAddedCourseDetails(response.data);
       console.log(response.data);
-
+      setSuccessMessage("success-p");
+      setTimeout(() => setSuccessMessage("success-p-hide"), 3000);
 
     } catch (error) {
       console.log(error.response?.data);
@@ -280,6 +281,9 @@ function CourseToolbar() {
                   <p className={errorMessage}>
                     ⚠️Note:
                       Please fill everything correctly before adding a new course.
+                    </p>
+                    <p className={successMessage}>
+                      Added
                     </p>
                   <div className="btns-div">
                     <button
