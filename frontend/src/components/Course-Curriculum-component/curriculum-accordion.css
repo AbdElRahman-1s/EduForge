@@ -1,0 +1,89 @@
+.curriculum {
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-radius: 15px;
+}
+
+.curriculum .curriculum-section{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+}
+
+.curriculum .curriculum-section:last-child{
+  border-bottom: none;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  gap: 15px;
+  transition: background-color 0.16s;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+}
+
+.section-header:last-child {
+  border-bottom: none;
+}
+
+
+
+.section-header .span-lessons {
+  color: oklch(0.705 0.015 286.067);
+}
+
+.section-header .span-arrow {
+  margin-left: auto;
+  margin-right: 5px;
+  color: oklch(0.705 0.015 286.067);
+}
+
+.section-header:hover {
+  background-color: oklch(0.985 0 0);
+
+}
+
+
+.lesson-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eeeff2;
+  transition: background-color 0.16s;
+}
+
+.lesson-row:last-child {
+  border-bottom: none;
+}
+
+.lesson-row span {
+  display: flex;
+  align-items: center;
+}
+
+.lesson-row:hover {
+  background-color: oklch(0.985 0 0);
+  ;
+}
+
+.lesson-title {
+  color: oklch(0.37 0.013 285.805);
+  flex: 1;
+}
+
+.lesson-title-completed {
+  flex: 1;
+  color: oklch(0.705 0.015 286.067);
+  text-decoration: line-through;
+}
+
+.lesson-duration,
+.lesson-status,
+.locked-svg {
+  color: oklch(0.705 0.015 286.067);
+}
+
+.completed-svg {
+  color: oklch(0.723 0.219 149.579);
+}

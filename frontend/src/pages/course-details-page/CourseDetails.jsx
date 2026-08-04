@@ -17,6 +17,7 @@ import './course-details.css';
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import CurriculumAccordion from "../../components/Course-Curriculum-component/CurriculumAccordion";
 
 
 
@@ -24,6 +25,10 @@ import axios from "axios";
 
 function CourseDetails() {
   const [courseDetails, setCourseDetails] = useState();
+  const [isEnrolled, setIsEnrolled] = useState(false);
+
+
+
 
   const { id } = useParams();
 
@@ -184,9 +189,15 @@ function CourseDetails() {
 
             <div className="bot-before-enroll-div">
               <h3>Course Curriculum</h3>
-              <div className="Curriculum-div">
-                <span>Curriculum details coming soon.</span>
-              </div>
+              {
+                isEnrolled ? <CurriculumAccordion />
+                  : (
+                    <div className="Curriculum-div">
+                      <span>Curriculum details coming soon.</span>
+                    </div>
+                  )
+              }
+
             </div>
 
 
