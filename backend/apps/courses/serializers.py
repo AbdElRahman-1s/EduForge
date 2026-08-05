@@ -15,6 +15,8 @@ class InstructorSerializer(serializers.ModelSerializer):
 
 
 class LessonDetailSerializer(serializers.ModelSerializer):
+    video = serializers.SerializerMethodField()
+
     class Meta:
         model = Lesson
         fields = [
@@ -25,6 +27,11 @@ class LessonDetailSerializer(serializers.ModelSerializer):
             "free",
             "video",
         ]
+
+    def get_video(self, obj):
+        if obj.free:
+            return obj.video
+        return None
 
 
 class SectionDetailSerializer(serializers.ModelSerializer):
@@ -117,9 +124,16 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 class CourseDetailSerializer(CourseListSerializer):
     sections = SectionDetailSerializer(many=True, read_only=True)
+    total_lessons = serializers.IntegerField(read_only=True)
+    total_duration_seconds = serializers.IntegerField(read_only=True)
 
     class Meta(CourseListSerializer.Meta):
-        fields = CourseListSerializer.Meta.fields + ["description", "sections"]
+        fields = CourseListSerializer.Meta.fields + [
+            "description",
+            "total_lessons",
+            "total_duration_seconds",
+            "sections",
+        ]
 
 
 class InstructorCourseSerializer(CourseListSerializer):

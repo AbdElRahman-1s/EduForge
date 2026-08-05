@@ -1,4 +1,4 @@
-from django.db.models.aggregates import Max
+from django.db.models.aggregates import Max, Count, Sum
 from django.db.models import Q
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -52,13 +52,23 @@ class CourseListCreateView(generics.ListCreateAPIView):
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
-        queryset = Course.objects.filter(published=True)
+        queryset = Course.objects.filter(published=True).annotate(
+            total_lessons=Count("sections__lessons"),
+            total_duration_seconds=Sum(
+                "sections__lessons__duration_seconds", default=0
+            ),
+        )
         if (
             self.request.user.is_authenticated
             and self.request.user.role == User.Role.INSTRUCTOR
         ):
             queryset = Course.objects.filter(
                 Q(published=True) | Q(instructor=self.request.user)
+            ).annotate(
+                total_lessons=Count("sections__lessons"),
+                total_duration_seconds=Sum(
+                    "sections__lessons__duration_seconds", default=0
+                ),
             )
         return queryset
 
