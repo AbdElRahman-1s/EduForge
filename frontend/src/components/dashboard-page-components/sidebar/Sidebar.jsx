@@ -50,7 +50,7 @@ function Sidebar({ switchSidebar, setSwitchSidebar , selected , setSelected}) {
               <LuLayoutDashboard />
               <span>Dashboard</span>
             </div>
-            <div className={selected === 'courses' ? 'selected' : "courses-side"}
+            <div className={(selected === 'courses' || selected === 'manage Curriculum') ? 'selected' : "courses-side"}
               onClick={() => { setSelected('courses') }}
             >
               <TiFolderOpen />
