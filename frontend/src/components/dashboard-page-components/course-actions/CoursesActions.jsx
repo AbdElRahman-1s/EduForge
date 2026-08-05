@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { LuPenLine } from "react-icons/lu";
 import { FaRegTrashCan } from "react-icons/fa6";
 
-
+import { MdOutlineMenuBook } from "react-icons/md";
 
 import { IoMdClose } from "react-icons/io";
 import { AiOutlinePicture } from "react-icons/ai";
@@ -87,7 +87,7 @@ import { AuthContext } from "../../../context/AuthContext";
 // ]
 
 
-function CoursesActions() {
+function CoursesActions({setSelected}) {
 
 
   const { accessToken } = useContext(AuthContext);
@@ -402,15 +402,29 @@ function CoursesActions() {
                   </div>
                   <div className="right-details-dash">
                     <span
+                      title="Edit Course"
                       onClick={() => { handleEdit(mineCourseResult) }}
                       className="edit-course">
                       <LuPenLine />
                     </span>
 
                     <span
+                      onClick={() => {
+                        setSelected('manage Curriculum')
+                        localStorage.setItem("selectedCourseId", mineCourseResult.id);
+                      }}
+                      title="Manage Curriculum"
+                      className="manage-course"
+                    >
+                      <MdOutlineMenuBook />
+                    </span>
+
+                    <span
+                      title="Delete Course"
                       disabled={disabledToggle}
                       onClick={() => deleteCourse(mineCourseResult.id)}
-                      className="delete-course"><FaRegTrashCan /></span>
+                      className="delete-course"><FaRegTrashCan />
+                    </span>
                   </div>
                 </div>
               )

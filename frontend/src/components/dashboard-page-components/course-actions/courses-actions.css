@@ -28,8 +28,13 @@
   display: flex;
   align-items: center;
   gap: 140px;
-  margin-left: 250px;
+  margin-left: 228px;
 }
+
+.right-header{
+  margin-right: 25px;
+}
+
 
 .course-details {
   display: flex;
@@ -129,6 +134,22 @@
 
 .right-details-dash .delete-course:hover {
   color: oklch(0.637 0.237 25.331);
+  background-color: oklch(0.971 0.013 17.38);
+}
+
+
+.right-details-dash .manage-course {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: oklch(0.705 0.015 286.067);
+  padding: 10px 12px;
+  border-radius: 150px;
+  transition: 0.20s;
+}
+
+.right-details-dash .manage-course:hover{
+    color: oklch(0.637 0.237 25.331);
   background-color: oklch(0.971 0.013 17.38);
 }
 
@@ -483,14 +504,15 @@
 .hide-warning {
   display: none !important;
 }
+
 .show-warning {
   display: block;
   color: red;
   font-size: 14px;
 }
 
-.show-warning ,
-.hide-warning{
+.show-warning,
+.hide-warning {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -499,13 +521,13 @@
 
 
 
-.success-p-hide{
+.success-p-hide {
   display: none;
 }
 
-.success-p{
+.success-p {
   display: flex;
-  align-items: center; 
+  align-items: center;
   justify-content: center;
   font-size: 15px;
   color: rgb(43, 255, 43);
