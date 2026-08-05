@@ -14,6 +14,39 @@ class InstructorSerializer(serializers.ModelSerializer):
         ]
 
 
+class LessonDetailSerializer(serializers.ModelSerializer):
+    video = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Lesson
+        fields = [
+            "id",
+            "title",
+            "duration_seconds",
+            "order",
+            "free",
+            "video",
+        ]
+
+    def get_video(self, obj):
+        if obj.free:
+            return obj.video
+        return None
+
+
+class SectionDetailSerializer(serializers.ModelSerializer):
+    lessons = LessonDetailSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Section
+        fields = [
+            "id",
+            "title",
+            "order",
+            "lessons",
+        ]
+
+
 class CourseSerializer(serializers.ModelSerializer):
     topics = serializers.PrimaryKeyRelatedField(
         required=False, queryset=Topic.objects.all(), many=True
@@ -90,8 +123,17 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 
 class CourseDetailSerializer(CourseListSerializer):
+    sections = SectionDetailSerializer(many=True, read_only=True)
+    total_lessons = serializers.IntegerField(read_only=True)
+    total_duration_seconds = serializers.IntegerField(read_only=True)
+
     class Meta(CourseListSerializer.Meta):
-        fields = CourseListSerializer.Meta.fields + ["description"]
+        fields = CourseListSerializer.Meta.fields + [
+            "description",
+            "total_lessons",
+            "total_duration_seconds",
+            "sections",
+        ]
 
 
 class InstructorCourseSerializer(CourseListSerializer):

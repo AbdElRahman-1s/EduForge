@@ -144,11 +144,16 @@ GET /api/courses/{id}/
 ## Authentication
 
 None required.
+Authentication is optional. Authenticated instructors can access their own unpublished courses.
 
 ## Behavior
 
-- Returns a published course only.
-- Unpublished courses return `404 Not Found` for non-owners and anonymous users.
+- Published courses are publicly accessible.
+- Course owners can retrieve their own courses regardless of publication status.
+- Non-owners and anonymous users receive `404 Not Found` when requesting an unpublished course.
+- Sections are returned ordered by their `order` field.
+- Lessons are returned ordered by their `order` field.
+- The `video` field is exposed only for free-preview lessons. Locked lessons return `null`.
 
 ## Success
 
@@ -173,7 +178,57 @@ None required.
     "email": "abdallah@example.com"
   },
   "published": true,
-  "created_at": "2026-07-01T10:00:00Z"
+  "created_at": "2026-07-01T10:00:00Z",
+  "total_lessons": 6,
+  "total_duration_seconds": 4920,
+  "sections": [
+    {
+      "id": 1,
+      "title": "Getting Started",
+      "order": 1,
+      "lessons": [
+        {
+          "id": 1,
+          "title": "Introduction",
+          "duration_seconds": 180,
+          "order": 1,
+          "free": true,
+          "video": "https://cdn.example.com/videos/intro.mp4"
+        },
+        {
+          "id": 2,
+          "title": "Environment Setup",
+          "duration_seconds": 420,
+          "order": 2,
+          "free": false,
+          "video": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Building APIs",
+      "order": 2,
+      "lessons": [
+        {
+          "id": 3,
+          "title": "Models",
+          "duration_seconds": 600,
+          "order": 1,
+          "free": false,
+          "video": null
+        },
+        {
+          "id": 4,
+          "title": "Serializers",
+          "duration_seconds": 720,
+          "order": 2,
+          "free": false,
+          "video": null
+        }
+      ]
+    }
+  ]
 }
 ```
 

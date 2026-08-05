@@ -1,5 +1,5 @@
-from django.db.models.aggregates import Max
-from django.db.models import Q
+from django.db.models.aggregates import Max, Count, Sum
+from django.db.models import Q, Prefetch
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,6 +16,8 @@ from .serializers import (
     LessonSerializer,
     SectionReorderSerializer,
     LessonReorderSerializer,
+    LessonDetailSerializer,
+    SectionDetailSerializer,
 )
 from .services import reorder_sections, reorder_lessons
 from .models import Course, Category, Topic, Section, Lesson
@@ -50,15 +52,32 @@ class CourseListCreateView(generics.ListCreateAPIView):
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
-        queryset = Course.objects.filter(published=True)
+        filters = Q(published=True)
         if (
             self.request.user.is_authenticated
             and self.request.user.role == User.Role.INSTRUCTOR
         ):
-            queryset = Course.objects.filter(
-                Q(published=True) | Q(instructor=self.request.user)
+            filters |= Q(instructor=self.request.user)
+
+        return (
+            Course.objects.filter(filters)
+            .select_related("instructor", "category")
+            .prefetch_related(
+                "topics",
+                Prefetch(
+                    "sections",
+                    queryset=Section.objects.order_by("order").prefetch_related(
+                        Prefetch("lessons", queryset=Lesson.objects.order_by("order"))
+                    ),
+                ),
             )
-        return queryset
+            .annotate(
+                total_lessons=Count("sections__lessons"),
+                total_duration_seconds=Sum(
+                    "sections__lessons__duration_seconds", default=0
+                ),
+            )
+        )
 
     def get_serializer_class(self):
         if self.request.method == "GET":
