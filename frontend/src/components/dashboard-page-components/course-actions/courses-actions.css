@@ -31,7 +31,7 @@
   margin-left: 228px;
 }
 
-.right-header{
+.right-header {
   margin-right: 25px;
 }
 
@@ -148,9 +148,9 @@
   transition: 0.20s;
 }
 
-.right-details-dash .manage-course:hover{
-    color: oklch(0.637 0.237 25.331);
-  background-color: oklch(0.971 0.013 17.38);
+.right-details-dash .manage-course:hover {
+  color: oklch(0.596 0.145 163.225);
+  background-color: oklch(0.979 0.021 166.113);
 }
 
 .best-category {

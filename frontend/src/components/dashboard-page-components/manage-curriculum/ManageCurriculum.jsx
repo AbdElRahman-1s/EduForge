@@ -5,11 +5,25 @@ import {
 } from 'lucide-react';
 
 import axios from 'axios';
+import { Reorder } from 'framer-motion';
 import './manage-curriculum.css';
 
 function ManageCurriculum({ setSelected }) {
 
   const [courseDetails, setCourseDetails] = useState(null);
+  const [addSection, setAddSection] = useState(false);
+  const [sectionTitle, setSectionTitle] = useState("");
+  const [editSection, setEditSection] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [addLesson, setAddLesson] = useState(false);
+  const [lessonTitle, setLessonTitle] = useState("");
+  const [lessonDuration, setLessonDuration] = useState(0);
+  const [locked, setLocked] = useState(true);
+  const [lessonTitleEdit, setLessonTitleEdit] = useState("");
+  const [lessonDurationEdit, setLessonDurationEdit] = useState(0);
+  const [lockedEdit, setLockedEdit] = useState(true);
+  const [editLesson , setEditLesson] = useState(false);
+
 
   const courseId = localStorage.getItem("selectedCourseId");
 
@@ -40,6 +54,12 @@ function ManageCurriculum({ setSelected }) {
     }
   ]);
 
+
+  const handleLessonReorder = (sectionId, newLessons) => {
+    setSections(prev =>
+      prev.map(sec => sec.id === sectionId ? { ...sec, lessons: newLessons } : sec)
+    );
+  };
 
 
   useEffect(() => {
@@ -94,7 +114,9 @@ function ManageCurriculum({ setSelected }) {
               Preview Course
             </button>
 
-            <button className="add-section-btn">
+            <button
+              onClick={() => setAddSection(true)}
+              className="add-section-btn">
               + Add Section
             </button>
           </div>
@@ -105,36 +127,54 @@ function ManageCurriculum({ setSelected }) {
           !  Drag and drop sections or lessons to recorder them.
         </div>
 
-        <div className='sections-lessons-container'>
+        <Reorder.Group
+          axis="y"
+          values={sections}
+          onReorder={setSections}
+          className='sections-lessons-container'
+          style={{ listStyle: 'none', padding: 0 }}
+        >
           {sections.map((section) => (
-            <div key={section.id} className="section-card">
+            <Reorder.Item key={section.id} value={section} className="section-card">
 
               {/* هيدر السكشن */}
               <div className="section-header-card">
                 <div className="section-title-wrapper">
                   <GripVertical className="drag-icon" size={18} />
                   <span className="section-title">{section.title}</span>
-                  <button className="icon-edit-title"><Pencil size={14} /></button>
+                  <button
+                    onClick={() => {
+                      setEditSection(true)
+                      setEditTitle(section.title)
+                    }}
+                    className="icon-edit-title"><Pencil size={14} /></button>
                 </div>
 
                 <div className="section-actions-btns">
-                  <button className="btn-add-lesson">
-                    <Plus size={15} /> Add Lesson
-                  </button>
-                  <button className="btn-sec-edit">
-                    <Pencil size={14} /> Edit
-                  </button>
-                  <button className="btn-sec-delete">
-                    <Trash2 size={14} /> Delete
-                  </button>
+                  <button
+                    onClick={() => setAddLesson(true)}
+                    className="btn-add-lesson"><Plus size={15} /> Add Lesson</button>
+                  <button
+                    onClick={() => {
+                      setEditSection(true)
+                      setEditTitle(section.title)
+                    }}
+                    className="btn-sec-edit"><Pencil size={14} /> Edit</button>
+                  <button className="btn-sec-delete"><Trash2 size={14} /> Delete</button>
                 </div>
               </div>
 
-              {/* قائمة الدروس داخل السكشن */}
+              {/* 🟢 تصحيح: غيرنا الـ div إلى Reorder.Group */}
               {section.lessons.length > 0 && (
-                <div className="lessons-wrapper">
+                <Reorder.Group
+                  axis="y"
+                  values={section.lessons}
+                  onReorder={(newLessons) => handleLessonReorder(section.id, newLessons)}
+                  className="lessons-wrapper"
+                  style={{ listStyle: 'none', padding: 0 }}
+                >
                   {section.lessons.map((lesson) => (
-                    <div key={lesson.id} className="lesson-item">
+                    <Reorder.Item key={lesson.id} value={lesson} className="lesson-item">
                       <div className="lesson-info">
                         <GripVertical className="drag-icon" size={16} />
                         {lesson.locked ? (
@@ -150,27 +190,260 @@ function ManageCurriculum({ setSelected }) {
                         <span className={`badge ${lesson.status.toLowerCase()}`}>
                           {lesson.status}
                         </span>
-                        <button className="icon-action-btn"><Pencil size={14} /></button>
+                        <button
+                        onClick={() => {
+                          setLessonTitleEdit(lesson.title);
+                          const numDuration = Number(lesson.duration);
+                          setLessonDurationEdit(numDuration);
+                          setLockedEdit(lesson.locked);
+                          setEditLesson(true);
+                        }} 
+                        className="icon-action-btn"><Pencil size={14} /></button>
                         <button className="icon-action-btn delete"><Trash2 size={14} /></button>
                       </div>
-                    </div>
+                    </Reorder.Item>
                   ))}
-                </div>
+                </Reorder.Group>
               )}
 
-            </div>
+            </Reorder.Item>
           ))}
-          {/* زر حفظ الترتيب في الأسفل */}
-          <div className="save-order-bar">
-            <button className="save-order-btn">
-              <Check size={16} /> Save Order
-            </button>
-            <span className="last-saved-text">Last saved: 2 minutes ago</span>
-          </div>
+        </Reorder.Group>
 
+        {/* 🟢 تصحيح: طلعنا زرار الحفظ خارج الـ Reorder.Group */}
+        <div className="save-order-bar">
+          <button className="save-order-btn">
+            <Check size={16} /> Save Order
+          </button>
+          <span className="last-saved-text">Last saved: 2 minutes ago</span>
         </div>
 
       </div>
+
+
+      {/*Modals*/}
+
+      {addSection && (
+        <div className="modal-overlay-section" onClick={() => setAddSection(false)}>
+          <div
+            className="modal-content-section"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Add New Section</h3>
+
+            <input
+              type="text"
+              placeholder="Enter section title..."
+              value={sectionTitle}
+              onChange={(e) => setSectionTitle(e.target.value)}
+            />
+
+            <div className="modal-buttons-section">
+              <button
+                className="btn-cancel-section"
+                onClick={() => setAddSection(false)}
+              >
+                Cancel
+              </button>
+
+              <button className="btn-save-section">
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editSection && (
+        <div className="modal-overlay-section" onClick={() => setEditSection(false)}>
+          <div
+            className="modal-content-section"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Edit Section</h3>
+
+            <input
+              type="text"
+              placeholder="Enter section title..."
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+            />
+
+            <div className="modal-buttons-section">
+              <button
+                className="btn-cancel-section"
+                onClick={() => setEditSection(false)}
+              >
+                Cancel
+              </button>
+
+              <button className="btn-save-section">
+                Edit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {addLesson && (
+        <div className="modal-overlay-lesson">
+          <div className="modal-lesson">
+            <div className="modal-content-lesson">
+
+              <div className="top-desc-lesson">
+                <h2>Add New Lesson</h2>
+
+                <span
+                  onClick={() => setAddLesson(false)}
+                  className="close-btn-lesson"
+                >
+                  ✕
+                </span>
+              </div>
+
+              <form>
+
+                <div className="form-group-lesson">
+                  <label htmlFor="lesson-title">Lesson Title</label>
+                  <input
+                    id="lesson-title"
+                    type="text"
+                    placeholder="Enter lesson title"
+                    value={lessonTitle}
+                    onChange={(e) => setLessonTitle(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group-lesson">
+                  <label htmlFor="lesson-duration">Duration (minutes)</label>
+                  <input
+                    id="lesson-duration"
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 15"
+                    value={lessonDuration}
+                    onChange={(e) => setLessonDuration(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group-lesson">
+                  <label>Access</label>
+
+                  <div className="radio-group-lesson">
+                    <label>
+                      <input
+                        type="radio"
+                        name="is_free"
+                        checked={locked === false}
+                        onChange={() => setLocked(false)}
+                      />
+                      Free
+                    </label>
+
+                    <label>
+                      <input
+                        type="radio"
+                        name="is_free"
+                        checked={locked === true}
+                        onChange={() => setLocked(true)}
+                      />
+                      Locked
+                    </label>
+                  </div>
+                </div>
+
+                <button type="submit" className="save-btn-lesson">
+                  Add Lesson
+                </button>
+
+              </form>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {editLesson && (
+        <div className="modal-overlay-lesson">
+          <div className="modal-lesson">
+            <div className="modal-content-lesson">
+
+              <div className="top-desc-lesson">
+                <h2>Edit Lesson</h2>
+
+                <span
+                  onClick={() => setEditLesson(false)}
+                  className="close-btn-lesson"
+                >
+                  ✕
+                </span>
+              </div>
+
+              <form>
+
+                <div className="form-group-lesson">
+                  <label htmlFor="lesson-title">Lesson Title</label>
+                  <input
+                    id="lesson-title"
+                    type="text"
+                    placeholder="Enter lesson title"
+                    value={lessonTitleEdit}
+                    onChange={(e) => setLessonTitle(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group-lesson">
+                  <label htmlFor="lesson-duration">Duration (minutes)</label>
+                  <input
+                    id="lesson-duration"
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 15"
+                    value={lessonDurationEdit}
+                    onChange={(e) => setLessonDuration(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group-lesson">
+                  <label>Access</label>
+
+                  <div className="radio-group-lesson">
+                    <label>
+                      <input
+                        type="radio"
+                        name="is_free"
+                        checked={lockedEdit === false}
+                        onChange={() => setLocked(false)}
+                      />
+                      Free
+                    </label>
+
+                    <label>
+                      <input
+                        type="radio"
+                        name="is_free"
+                        checked={lockedEdit === true}
+                        onChange={() => setLocked(true)}
+                      />
+                      Locked
+                    </label>
+                  </div>
+                </div>
+
+                <button type="submit" className="save-btn-lesson">
+                  Edit Lesson
+                </button>
+
+              </form>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
     </>
   );
 }

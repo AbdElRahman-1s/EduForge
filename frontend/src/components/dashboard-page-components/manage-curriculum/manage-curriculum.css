@@ -307,3 +307,207 @@
   font-size: 13px;
   color: #a0aec0;
 }
+
+/* modals styles */
+
+.modal-overlay-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px); /* تغبيش بسيط للخلفية */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* صندوق الـ Overlay */
+.modal-content-section {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: popIn 0.2s ease-out;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-content-section h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #1e293b;
+}
+
+/* خانة الكتابة */
+.modal-content-section input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.modal-content-section input:focus {
+  border-color: #6366f1;
+}
+
+/* أزرار Cancel و Add */
+.modal-buttons-section {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-buttons-section button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.btn-cancel-section {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.btn-save-section {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.modal-buttons-section button:hover {
+  opacity: 0.9;
+}
+
+
+.modal-overlay-lesson {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-lesson {
+  width: 100%;
+  max-width: 500px;
+  margin: 20px;
+}
+
+.modal-content-lesson {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.top-desc-lesson {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.top-desc-lesson h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.close-btn-lesson {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #777;
+  transition: 0.2s;
+}
+
+.close-btn-lesson:hover {
+  color: #000;
+}
+
+.form-group-lesson {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.form-group-lesson label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group-lesson input[type="text"],
+.form-group-lesson input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.form-group-lesson input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.radio-group-lesson {
+  display: flex;
+  gap: 24px;
+}
+
+.radio-group-lesson label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.radio-group-lesson input[type="radio"] {
+  accent-color: #4f46e5;
+}
+
+.save-btn-lesson {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.save-btn-lesson:hover {
+  background: #4338ca;
+}
