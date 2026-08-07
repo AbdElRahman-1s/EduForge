@@ -1,0 +1,513 @@
+.manage-curriculum {
+  padding: 5px 25px 30px 25px;
+}
+
+.back-btn{
+  border: none;
+  margin-left: 10px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: color 0.16s;
+}
+
+.back-btn:hover{
+  color: #6d28d9;
+}
+
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.course-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.course-info img {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.course-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.course-text h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.course-text span {
+  color: #6b7280;
+}
+
+
+.course-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.preview-btn {
+  padding: 10px 16px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.preview-btn:hover {
+  background: #f9fafb;
+}
+
+.add-section-btn {
+  padding: 10px 18px;
+  border: none;
+  background: #7c3aed;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-section-btn:hover {
+  background: #6d28d9;
+}
+
+.drag-drop-div {
+  margin-top: 20px;
+  padding: 15px 10px 15px 20px;
+  border: 1px solid rgb(235, 232, 232);
+  color: #6d28d9;
+  background-color: rgb(251, 251, 251);
+  border-radius: 15px;
+  font-weight: 500;
+}
+
+
+
+/* Container Wrapper */
+.sections-lessons-container {
+  background-color: transparent; /* لغينا الباك جراوند العادية عشان الكروت تظهر بشكل منفصل */
+  margin-top: 20px;
+  padding: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* كارت السكشن */
+.section-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* هيدر السكشن */
+.section-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drag-icon {
+  color: #a0aec0;
+  cursor: grab;
+}
+
+.section-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1a202c;
+}
+
+.icon-edit-title {
+  background: none;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.section-actions-btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* أزرار السكشن */
+.btn-add-lesson {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f3e8ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-sec-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-sec-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid #fed7d7;
+  color: #e53e3e;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* قائمة الدروس الداخلية */
+.lessons-wrapper {
+  margin-top: 14px;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.lesson-item:last-child {
+  border-bottom: none;
+}
+
+.lesson-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lesson-type-icon {
+  color: #718096;
+}
+
+.lesson-title {
+  font-size: 14px;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.lesson-details {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lesson-duration {
+  font-size: 13px;
+  color: #718096;
+}
+
+/* الشارات (Free / Locked) */
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge.free {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.badge.locked {
+  background-color: #edf2f7;
+  color: #718096;
+}
+
+.icon-action-btn {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.icon-action-btn:hover {
+  color: #4a5568;
+}
+
+.icon-action-btn.delete:hover {
+  color: #e53e3e;
+}
+
+/* شريط Save Order في الأسفل */
+.save-order-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.save-order-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.last-saved-text {
+  font-size: 13px;
+  color: #a0aec0;
+}
+
+/* modals styles */
+
+.modal-overlay-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px); /* تغبيش بسيط للخلفية */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* صندوق الـ Overlay */
+.modal-content-section {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: popIn 0.2s ease-out;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-content-section h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #1e293b;
+}
+
+/* خانة الكتابة */
+.modal-content-section input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.modal-content-section input:focus {
+  border-color: #6366f1;
+}
+
+/* أزرار Cancel و Add */
+.modal-buttons-section {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-buttons-section button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.btn-cancel-section {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.btn-save-section {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.modal-buttons-section button:hover {
+  opacity: 0.9;
+}
+
+
+.modal-overlay-lesson {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-lesson {
+  width: 100%;
+  max-width: 500px;
+  margin: 20px;
+}
+
+.modal-content-lesson {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.top-desc-lesson {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.top-desc-lesson h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.close-btn-lesson {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #777;
+  transition: 0.2s;
+}
+
+.close-btn-lesson:hover {
+  color: #000;
+}
+
+.form-group-lesson {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.form-group-lesson label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group-lesson input[type="text"],
+.form-group-lesson input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.form-group-lesson input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.radio-group-lesson {
+  display: flex;
+  gap: 24px;
+}
+
+.radio-group-lesson label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.radio-group-lesson input[type="radio"] {
+  accent-color: #4f46e5;
+}
+
+.save-btn-lesson {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.save-btn-lesson:hover {
+  background: #4338ca;
+}

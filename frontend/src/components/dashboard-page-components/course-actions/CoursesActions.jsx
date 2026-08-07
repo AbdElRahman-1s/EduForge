@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { LuPenLine } from "react-icons/lu";
 import { FaRegTrashCan } from "react-icons/fa6";
 
-
+import { MdOutlineMenuBook } from "react-icons/md";
 
 import { IoMdClose } from "react-icons/io";
 import { AiOutlinePicture } from "react-icons/ai";
@@ -14,80 +14,9 @@ import { AuthContext } from "../../../context/AuthContext";
 
 
 
-// const recentCoursesActions = [
-//   {
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     category: 'Bestseller',
-//     students: '48,200',
-//     price: 89,
-//     courseCategory: 'development',
-//     courseLevel: 'beginner',
-//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-//   },
-//   {
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     category: 'Bestseller',
-//     students: '48,200',
-//     price: 89,
-//     courseCategory: 'development',
-//     courseLevel: 'beginner',
-//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-//   },
-//   {
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     category: 'New',
-//     students: '48,200',
-//     price: 89,
-//     courseCategory: 'development',
-//     courseLevel: 'beginner',
-//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-//   },
-//   {
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     category: 'Bestseller',
-//     students: '48,200',
-//     price: 89,
-//     courseCategory: 'development',
-//     courseLevel: 'beginner',
-//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-//   },
-//   {
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     category: 'Hot',
-//     students: '48,200',
-//     price: 89,
-//     courseCategory: 'development',
-//     courseLevel: 'beginner',
-//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.'
-//   },
-//   {
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     category: 'Bestseller',
-//     students: '48,200',
-//     price: 89,
-//     courseCategory: 'development',
-//     courseLevel: 'beginner',
-//     courseDesc: 'Master React 18, Next.js 14, TypeScript, and modern full-stack patterns with real-world projects.frfr'
-//   },
 
 
-
-// ]
-
-
-function CoursesActions() {
+function CoursesActions({setSelected}) {
 
 
   const { accessToken } = useContext(AuthContext);
@@ -402,15 +331,29 @@ function CoursesActions() {
                   </div>
                   <div className="right-details-dash">
                     <span
+                      title="Edit Course"
                       onClick={() => { handleEdit(mineCourseResult) }}
                       className="edit-course">
                       <LuPenLine />
                     </span>
 
                     <span
+                      onClick={() => {
+                        setSelected('manage Curriculum')
+                        localStorage.setItem("selectedCourseId", mineCourseResult.id);
+                      }}
+                      title="Manage Curriculum"
+                      className="manage-course"
+                    >
+                      <MdOutlineMenuBook />
+                    </span>
+
+                    <span
+                      title="Delete Course"
                       disabled={disabledToggle}
                       onClick={() => deleteCourse(mineCourseResult.id)}
-                      className="delete-course"><FaRegTrashCan /></span>
+                      className="delete-course"><FaRegTrashCan />
+                    </span>
                   </div>
                 </div>
               )
