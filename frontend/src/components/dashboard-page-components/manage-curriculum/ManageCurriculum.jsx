@@ -23,6 +23,8 @@ function ManageCurriculum({ setSelected }) {
   const [lessonDurationEdit, setLessonDurationEdit] = useState(0);
   const [lockedEdit, setLockedEdit] = useState(true);
   const [editLesson , setEditLesson] = useState(false);
+  const [videoUrl,setVideoUrl] = useState("");
+  const [editVideoUrl, setEditVideoUrl] = useState("");
 
 
   const courseId = localStorage.getItem("selectedCourseId");
@@ -313,6 +315,16 @@ function ManageCurriculum({ setSelected }) {
                     onChange={(e) => setLessonTitle(e.target.value)}
                   />
                 </div>
+                <div className="form-group-lesson">
+                  <label htmlFor="video-url">Video URL</label>
+                  <input
+                    id="video-url"
+                    type="text"
+                    placeholder="Enter lesson video url"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                  />
+                </div>
 
                 <div className="form-group-lesson">
                   <label htmlFor="lesson-duration">Duration (minutes)</label>
@@ -389,7 +401,17 @@ function ManageCurriculum({ setSelected }) {
                     type="text"
                     placeholder="Enter lesson title"
                     value={lessonTitleEdit}
-                    onChange={(e) => setLessonTitle(e.target.value)}
+                    onChange={(e) => setLessonTitleEdit(e.target.value)}
+                  />
+                </div>
+                <div className="form-group-lesson">
+                  <label htmlFor="video-url">Video URL</label>
+                  <input
+                    id="video-url"
+                    type="text"
+                    placeholder="Enter lesson video url"
+                    value={editVideoUrl}
+                    onChange={(e) => setEditVideoUrl(e.target.value)}
                   />
                 </div>
 
@@ -401,7 +423,7 @@ function ManageCurriculum({ setSelected }) {
                     min="1"
                     placeholder="e.g. 15"
                     value={lessonDurationEdit}
-                    onChange={(e) => setLessonDuration(e.target.value)}
+                    onChange={(e) => setLessonDurationEdit(e.target.value)}
                   />
                 </div>
 
@@ -414,7 +436,7 @@ function ManageCurriculum({ setSelected }) {
                         type="radio"
                         name="is_free"
                         checked={lockedEdit === false}
-                        onChange={() => setLocked(false)}
+                        onChange={() => setLockedEdit(false)}
                       />
                       Free
                     </label>
@@ -424,7 +446,7 @@ function ManageCurriculum({ setSelected }) {
                         type="radio"
                         name="is_free"
                         checked={lockedEdit === true}
-                        onChange={() => setLocked(true)}
+                        onChange={() => setLockedEdit(true)}
                       />
                       Locked
                     </label>
