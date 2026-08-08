@@ -31,7 +31,7 @@ function ManageCurriculum({ setSelected }) {
   const [editVideoUrl, setEditVideoUrl] = useState("");
 
   const [selectedSectionId, setSelectedSectionId] = useState(null);
-  const [selectedLessonId,setSelectedLessonId] = useState(null);
+  const [selectedLessonId, setSelectedLessonId] = useState(null);
 
 
   const courseId = localStorage.getItem("selectedCourseId");
@@ -79,7 +79,11 @@ function ManageCurriculum({ setSelected }) {
       )
 
       console.log(response.data);
-
+      //تحديث ال state
+      setSections(prev => [
+        ...prev,
+        response.data
+      ]);
 
     } catch (error) {
       console.log(error.data);
@@ -102,7 +106,13 @@ function ManageCurriculum({ setSelected }) {
       );
 
       console.log(response.data);
-
+      setSections(prev =>
+        prev.map(section =>
+          section.id === sectionId
+            ? response.data
+            : section
+        )
+      );
 
     } catch (error) {
       console.log(error);
@@ -121,6 +131,10 @@ function ManageCurriculum({ setSelected }) {
             Authorization: `Bearer ${accessToken}`,
           }
         }
+      );
+
+      setSections(prev =>
+        prev.filter(section => section.id !== sectionId)
       );
 
     } catch (error) {
@@ -150,7 +164,16 @@ function ManageCurriculum({ setSelected }) {
       );
 
       console.log(response.data);
-
+      setSections(prev =>
+        prev.map(section =>
+          section.id === sectionId
+            ? {
+              ...section,
+              lessons: [...section.lessons, response.data]
+            }
+            : section
+        )
+      );
 
     } catch (error) {
       console.log(error.response?.data);
@@ -160,36 +183,73 @@ function ManageCurriculum({ setSelected }) {
 
   async function patchEditLesson(sectionId, lessonId) {
 
-    await axios.patch(`/api/sections/${sectionId}/lessons/${lessonId}/`,
-      {
-        title: lessonTitleEdit,
-        video: editVideoUrl,
-        duration_seconds: minutesToSeconds(lessonDurationEdit),
-        free: editFree,
-      }
-      , {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        }
-      }
-    );
+    try {
 
-  }
-
-
-  async function deleteDeleteLesson(sectionId,lessonId){
-
-    try{
-      await axios.delete(`/api/sections/${sectionId}/lessons/${lessonId}/`,
+      const response = await axios.patch(`/api/sections/${sectionId}/lessons/${lessonId}/`,
         {
-          headers:{
+          title: lessonTitleEdit,
+          video: editVideoUrl,
+          duration_seconds: minutesToSeconds(lessonDurationEdit),
+          free: editFree,
+        }
+        , {
+          headers: {
             Authorization: `Bearer ${accessToken}`,
           }
         }
       );
-    }catch(error){
+
+      setSections(prev =>
+        prev.map(section =>
+          section.id === sectionId
+            ? {
+              ...section,
+              lessons: section.lessons.map(lesson =>
+                lesson.id === lessonId
+                  ? response.data
+                  : lesson
+              )
+            }
+            : section
+        )
+      );
+
+    } catch (error) {
       console.log(error);
-      
+
+    }
+
+  }
+
+
+  async function deleteDeleteLesson(sectionId, lessonId) {
+
+    try {
+      await axios.delete(`/api/sections/${sectionId}/lessons/${lessonId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
+
+      setSections(prev =>
+        prev.map(section =>
+          section.id === sectionId
+            ? {
+              ...section,
+              lessons: section.lessons.filter(
+                lesson => lesson.id !== lessonId
+              )
+            }
+            : section
+        )
+      );
+
+
+    } catch (error) {
+      console.log(error);
+
     }
 
   }
@@ -331,9 +391,9 @@ function ManageCurriculum({ setSelected }) {
                           className="icon-action-btn"><Pencil size={14} /></button>
                         <button
                           onClick={() => {
-                            deleteDeleteLesson(section.id,lesson.id);
+                            deleteDeleteLesson(section.id, lesson.id);
                           }}
-                         className="icon-action-btn delete"><Trash2 size={14} /></button>
+                          className="icon-action-btn delete"><Trash2 size={14} /></button>
                       </div>
                     </Reorder.Item>
                   ))}
