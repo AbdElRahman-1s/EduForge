@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../../context/AuthContext';
+import { minutesToSeconds, secondsToTime } from '../../../utills/time.js';
 import {
   Plus, GripVertical, PlayCircle, Lock,
   Pencil, Trash2, Check
@@ -10,6 +12,8 @@ import './manage-curriculum.css';
 
 function ManageCurriculum({ setSelected }) {
 
+  const { accessToken } = useContext(AuthContext);
+
   const [courseDetails, setCourseDetails] = useState(null);
   const [addSection, setAddSection] = useState(false);
   const [sectionTitle, setSectionTitle] = useState("");
@@ -18,43 +22,22 @@ function ManageCurriculum({ setSelected }) {
   const [addLesson, setAddLesson] = useState(false);
   const [lessonTitle, setLessonTitle] = useState("");
   const [lessonDuration, setLessonDuration] = useState(0);
-  const [locked, setLocked] = useState(true);
+  const [free, setFree] = useState(false);
   const [lessonTitleEdit, setLessonTitleEdit] = useState("");
   const [lessonDurationEdit, setLessonDurationEdit] = useState(0);
   const [lockedEdit, setLockedEdit] = useState(true);
-  const [editLesson , setEditLesson] = useState(false);
-  const [videoUrl,setVideoUrl] = useState("");
+  const [editLesson, setEditLesson] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
   const [editVideoUrl, setEditVideoUrl] = useState("");
+
+  const [selectedSectionId, setSelectedSectionId] = useState(null);
 
 
   const courseId = localStorage.getItem("selectedCourseId");
 
-  const [sections, setSections] = useState([
-    {
-      id: 1,
-      title: "1. Getting Started",
-      lessons: [
-        { id: 101, title: "1.1 Welcome & Course Overview", duration: "05:32", status: "Free", locked: false },
-        { id: 102, title: "1.2 How This Course Works", duration: "04:15", status: "Free", locked: false },
-        { id: 103, title: "1.3 Tools You Need", duration: "06:40", status: "Locked", locked: true },
-        { id: 104, title: "1.4 Installations", duration: "07:20", status: "Locked", locked: true },
-      ]
-    },
-    {
-      id: 2,
-      title: "2. Basic Concepts",
-      lessons: [
-        { id: 201, title: "2.1 What is React?", duration: "06:10", status: "Free", locked: false },
-        { id: 202, title: "2.2 Your First Component", duration: "08:45", status: "Locked", locked: true },
-        { id: 203, title: "2.3 JSX Explained", duration: "09:30", status: "Locked", locked: true },
-      ]
-    },
-    {
-      id: 3,
-      title: "3. Components",
-      lessons: []
-    }
-  ]);
+
+  const [sections, setSections] = useState([]);
+
 
 
   const handleLessonReorder = (sectionId, newLessons) => {
@@ -70,6 +53,7 @@ function ManageCurriculum({ setSelected }) {
         const response = await axios.get(`/api/courses/${courseId}/`);
 
         setCourseDetails(response.data);
+        setSections(response.data.sections);
       } catch (error) {
         console.log(error);
       }
@@ -79,6 +63,60 @@ function ManageCurriculum({ setSelected }) {
       fetchCourse();
     }
   }, [courseId]);
+
+  async function postAddSection() {
+    try {
+      const response = await axios.post(`/api/courses/${courseId}/sections/`,
+        {
+          title: sectionTitle
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      )
+
+      console.log(response.data);
+
+
+    } catch (error) {
+      console.log(error.data);
+
+    }
+  }
+
+
+
+  async function postAddLesson(sectionId) {
+    try {
+
+      const response = await axios.post(`/api/sections/${sectionId}/lessons/`,
+        {
+          title: lessonTitle,
+          video: videoUrl,
+          duration_seconds: minutesToSeconds(lessonDuration),
+          free: free
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
+
+      console.log(response.data);
+
+
+    } catch (error) {
+      console.log(error.response?.data);
+
+    }
+  }
+
+
+
+
 
   if (!courseDetails) {
     return <h2>Loading...</h2>;
@@ -154,7 +192,10 @@ function ManageCurriculum({ setSelected }) {
 
                 <div className="section-actions-btns">
                   <button
-                    onClick={() => setAddLesson(true)}
+                    onClick={() => {
+                      setSelectedSectionId(section.id);
+                      setAddLesson(true)
+                    }}
                     className="btn-add-lesson"><Plus size={15} /> Add Lesson</button>
                   <button
                     onClick={() => {
@@ -179,28 +220,28 @@ function ManageCurriculum({ setSelected }) {
                     <Reorder.Item key={lesson.id} value={lesson} className="lesson-item">
                       <div className="lesson-info">
                         <GripVertical className="drag-icon" size={16} />
-                        {lesson.locked ? (
-                          <Lock size={16} className="lesson-type-icon" />
-                        ) : (
+                        {lesson.free ? (
                           <PlayCircle size={16} className="lesson-type-icon" />
+                        ) : (
+                          <Lock size={16} className="lesson-type-icon" />
                         )}
                         <span className="lesson-title">{lesson.title}</span>
                       </div>
 
                       <div className="lesson-details">
-                        <span className="lesson-duration">{lesson.duration}</span>
-                        <span className={`badge ${lesson.status.toLowerCase()}`}>
-                          {lesson.status}
+                        <span className="lesson-duration">{secondsToTime(lesson.duration_seconds)}</span>
+                        <span className={`badge ${(lesson.free)? 'free' : 'locked'}`}>
+                          {(lesson.free)? 'Free' : 'Locked'}
                         </span>
                         <button
-                        onClick={() => {
-                          setLessonTitleEdit(lesson.title);
-                          const numDuration = Number(lesson.duration);
-                          setLessonDurationEdit(numDuration);
-                          setLockedEdit(lesson.locked);
-                          setEditLesson(true);
-                        }} 
-                        className="icon-action-btn"><Pencil size={14} /></button>
+                          onClick={() => {
+                            setLessonTitleEdit(lesson.title);
+                            const numDuration = Number(lesson.duration);
+                            setLessonDurationEdit(numDuration);
+                            setLockedEdit(lesson.locked);
+                            setEditLesson(true);
+                          }}
+                          className="icon-action-btn"><Pencil size={14} /></button>
                         <button className="icon-action-btn delete"><Trash2 size={14} /></button>
                       </div>
                     </Reorder.Item>
@@ -248,7 +289,9 @@ function ManageCurriculum({ setSelected }) {
                 Cancel
               </button>
 
-              <button className="btn-save-section">
+              <button
+                onClick={() => postAddSection()}
+                className="btn-save-section">
                 Add
               </button>
             </div>
@@ -346,8 +389,8 @@ function ManageCurriculum({ setSelected }) {
                       <input
                         type="radio"
                         name="is_free"
-                        checked={locked === false}
-                        onChange={() => setLocked(false)}
+                        checked={free === true}
+                        onChange={() => setFree(true)}
                       />
                       Free
                     </label>
@@ -356,15 +399,17 @@ function ManageCurriculum({ setSelected }) {
                       <input
                         type="radio"
                         name="is_free"
-                        checked={locked === true}
-                        onChange={() => setLocked(true)}
+                        checked={free === false}
+                        onChange={() => setFree(false)}
                       />
                       Locked
                     </label>
                   </div>
                 </div>
 
-                <button type="submit" className="save-btn-lesson">
+                <button
+                  onClick={() => postAddLesson(selectedSectionId)}
+                  type="submit" className="save-btn-lesson">
                   Add Lesson
                 </button>
 
