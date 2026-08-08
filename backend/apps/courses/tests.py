@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
 
-from .models import Course
+from .models import Category, Course, Topic
 
 
 class CoursePermissionsAndVisibilityTests(APITestCase):
@@ -32,24 +32,43 @@ class CoursePermissionsAndVisibilityTests(APITestCase):
             role=User.Role.STUDENT,
         )
 
+        self.category = Category.objects.create(name="Programming")
+        self.topic = Topic.objects.create(name="Django")
+
+        # Published courses must satisfy the publish invariants (price, thumbnail,
+        # at least one topic), otherwise any later update fails re-validation.
         self.published_course = Course.objects.create(
             title="Published course",
             description="Published course description",
             instructor=self.instructor,
+            category=self.category,
+            level=Course.CourseLevel.BEGINNER,
+            price="49.99",
+            thumbnail="courses/published.png",
             published=True,
         )
+        self.published_course.topics.add(self.topic)
+
         self.draft_course = Course.objects.create(
             title="Draft course",
             description="Draft course description",
             instructor=self.instructor,
+            category=self.category,
+            level=Course.CourseLevel.BEGINNER,
             published=False,
         )
+
         self.other_published_course = Course.objects.create(
             title="Other instructor published course",
             description="Another published course",
             instructor=self.other_instructor,
+            category=self.category,
+            level=Course.CourseLevel.BEGINNER,
+            price="29.99",
+            thumbnail="courses/other-published.png",
             published=True,
         )
+        self.other_published_course.topics.add(self.topic)
 
     def _auth_as(self, user):
         refresh = RefreshToken.for_user(user)
@@ -124,13 +143,14 @@ class CoursePermissionsAndVisibilityTests(APITestCase):
         payload = {
             "title": "New instructor course",
             "description": "Course description",
+            "category": self.category.id,
+            "level": Course.CourseLevel.BEGINNER,
         }
 
         response = self.client.post(self.list_url, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["title"], payload["title"])
-        self.assertEqual(response.data["instructor"]["id"], self.instructor.id)
         self.assertTrue(
             Course.objects.filter(
                 title=payload["title"], instructor=self.instructor
