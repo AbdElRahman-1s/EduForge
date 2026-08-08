@@ -86,6 +86,49 @@ function ManageCurriculum({ setSelected }) {
     }
   }
 
+  async function patchEditSection(sectionId){
+
+    try{
+     const response = await axios.patch(`/api/courses/${courseId}/sections/${sectionId}/`,
+      {
+        title: editTitle,
+      },
+      {
+        headers:{
+          Authorization: `Bearer ${accessToken}`,
+        }
+      }
+     ); 
+
+     console.log(response.data);
+     
+
+    }catch(error){
+    console.log(error);
+    
+  }
+
+  }
+
+  async function deleteDeleteSection(sectionId){
+
+    try{
+
+       await axios.delete(`/api/courses/${courseId}/sections/${sectionId}/`,
+        {
+          headers:{
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
+
+    }catch(error){
+      console.log(error);
+      
+    }
+
+  } 
+
 
 
   async function postAddLesson(sectionId) {
@@ -199,11 +242,16 @@ function ManageCurriculum({ setSelected }) {
                     className="btn-add-lesson"><Plus size={15} /> Add Lesson</button>
                   <button
                     onClick={() => {
+                      setSelectedSectionId(section.id);
                       setEditSection(true)
                       setEditTitle(section.title)
                     }}
                     className="btn-sec-edit"><Pencil size={14} /> Edit</button>
-                  <button className="btn-sec-delete"><Trash2 size={14} /> Delete</button>
+                  <button
+                  onClick={() => {
+                    deleteDeleteSection(section.id);
+                  }} 
+                  className="btn-sec-delete"><Trash2 size={14} /> Delete</button>
                 </div>
               </div>
 
@@ -306,7 +354,7 @@ function ManageCurriculum({ setSelected }) {
             onClick={(e) => e.stopPropagation()}
           >
             <h3>Edit Section</h3>
-
+          <form>
             <input
               type="text"
               placeholder="Enter section title..."
@@ -322,10 +370,15 @@ function ManageCurriculum({ setSelected }) {
                 Cancel
               </button>
 
-              <button className="btn-save-section">
+              <button
+              onClick={() => patchEditSection(selectedSectionId)} 
+              type='submit'
+              className="btn-save-section"
+              >
                 Edit
               </button>
             </div>
+            </form>
           </div>
         </div>
       )}
