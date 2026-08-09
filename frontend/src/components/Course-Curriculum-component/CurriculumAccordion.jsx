@@ -1,72 +1,19 @@
 import { useState } from "react";
-
-
+import { secondsToTime } from "../../utills/time";
 
 import { GoLock } from "react-icons/go";
 import { IoIosPlay } from "react-icons/io";
-import { LuCircleCheckBig } from "react-icons/lu";
-import { IoIosArrowDown , IoIosArrowUp } from "react-icons/io";
+// import { LuCircleCheckBig } from "react-icons/lu";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 
 import './curriculum-accordion.css';
 
-function CurriculumAccordion() {
+function CurriculumAccordion({ sections }) {
 
   const [openSectionId, setOpenSectionId] = useState(null);
 
 
-
-
-  const sections = [
-    {
-      id: 1,
-      title: "Getting Started",
-      lessons: [
-        {
-          id: 1,
-          title: "Course Introduction",
-          duration: "5 min",
-          status: "preview",
-        },
-        {
-          id: 2,
-          title: "Install React",
-          duration: "12 min",
-          status: "locked",
-        },
-        {
-          id: 3,
-          title: "Components",
-          duration: "8 min",
-          status: "completed",
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "React Basics",
-      lessons: [
-        {
-          id: 4,
-          title: "JSX",
-          duration: "10 min",
-          status: "completed",
-        },
-        {
-          id: 5,
-          title: "Props",
-          duration: "15 min",
-          status: "locked",
-        },
-        {
-          id: 6,
-          title: "State",
-          duration: "20 min",
-          status: "locked",
-        },
-      ],
-    },
-  ];
 
 
   return (
@@ -89,7 +36,7 @@ function CurriculumAccordion() {
               <span className="span-lessons">
                 {section.lessons.length} lessons
               </span>
-              
+
               <span className="span-arrow">
                 {
                   openSectionId === section.id ? <IoIosArrowUp /> : <IoIosArrowDown />
@@ -107,9 +54,9 @@ function CurriculumAccordion() {
                       <div className="lesson-row" key={lesson.id}>
 
                         <span className="lesson-icon">
-                          {lesson.status === "preview" && <IoIosPlay />}
-                          {lesson.status === "locked" && <GoLock className="locked-svg" />}
-                          {lesson.status === "completed" && <LuCircleCheckBig className="completed-svg" />}
+                          {lesson.free && <IoIosPlay />}
+                          {!lesson.free && <GoLock className="locked-svg" />}
+                          {/* {lesson.status === "completed" && <LuCircleCheckBig className="completed-svg" />} */}
                         </span>
 
                         <span className={lesson.status === "completed" ? "lesson-title-completed" : "lesson-title"}>
@@ -117,13 +64,12 @@ function CurriculumAccordion() {
                         </span>
 
                         <span className="lesson-duration">
-                          {lesson.duration}
+                          {secondsToTime(lesson.duration_seconds)}
                         </span>
 
                         <span className="lesson-status">
-                          {lesson.status === "preview" && "Free Preview"}
-                          {lesson.status === "locked" && "Locked"}
-                          {lesson.status === "completed" && "Completed"}
+                          {lesson.free ? "Free Preview" : "Locked"}
+                          {/* {lesson.status === "completed" && "Completed"} */}
                         </span>
 
                       </div>
