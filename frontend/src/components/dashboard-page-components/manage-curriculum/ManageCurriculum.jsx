@@ -41,11 +41,7 @@ function ManageCurriculum({ setSelected }) {
 
 
 
-  const handleLessonReorder = (sectionId, newLessons) => {
-    setSections(prev =>
-      prev.map(sec => sec.id === sectionId ? { ...sec, lessons: newLessons } : sec)
-    );
-  };
+
 
 
   useEffect(() => {
@@ -256,6 +252,62 @@ function ManageCurriculum({ setSelected }) {
 
 
 
+  const handleReorderSection = async (newSections) => {
+    setSections(newSections);
+
+    const order = newSections.map(section => section.id);
+
+    try {
+      const response = await axios.patch(
+        `/api/courses/${courseId}/sections/reorder/`,
+        { order },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
+
+      console.log(response.data);
+
+
+    } catch (error) {
+      console.log(error);
+
+    }
+
+  };
+
+
+  const handleLessonReorder = async (sectionId, newLessons) => {
+    setSections(prev =>
+      prev.map(sec => sec.id === sectionId ? { ...sec, lessons: newLessons } : sec)
+    );
+
+    const order = newLessons.map(lesson => lesson.id);
+
+    try {
+    const response =  await axios.patch(
+        `/api/sections/${sectionId}/lessons/reorder/`,
+        { order },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log(response.data);
+      
+
+    } catch (error) {
+      console.error(error);
+    }
+
+  };
+
+
+
 
 
   if (!courseDetails) {
@@ -310,7 +362,7 @@ function ManageCurriculum({ setSelected }) {
         <Reorder.Group
           axis="y"
           values={sections}
-          onReorder={setSections}
+          onReorder={handleReorderSection}
           className='sections-lessons-container'
           style={{ listStyle: 'none', padding: 0 }}
         >
@@ -475,7 +527,7 @@ function ManageCurriculum({ setSelected }) {
 
                 <button
                   onClick={() => patchEditSection(selectedSectionId)}
-                  type='submit'
+                  type='button'
                   className="btn-save-section"
                 >
                   Edit
@@ -565,7 +617,7 @@ function ManageCurriculum({ setSelected }) {
 
                 <button
                   onClick={() => postAddLesson(selectedSectionId)}
-                  type="submit" className="save-btn-lesson">
+                  type="button" className="save-btn-lesson">
                   Add Lesson
                 </button>
 
@@ -656,7 +708,7 @@ function ManageCurriculum({ setSelected }) {
 
                 <button
                   onClick={() => patchEditLesson(selectedSectionId, selectedLessonId)}
-                  type="submit" className="save-btn-lesson">
+                  type="button" className="save-btn-lesson">
                   Edit Lesson
                 </button>
 
