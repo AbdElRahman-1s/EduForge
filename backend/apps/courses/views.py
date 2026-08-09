@@ -16,8 +16,6 @@ from .serializers import (
     LessonSerializer,
     SectionReorderSerializer,
     LessonReorderSerializer,
-    LessonDetailSerializer,
-    SectionDetailSerializer,
 )
 from .services import reorder_sections, reorder_lessons
 from .models import Course, Category, Topic, Section, Lesson
@@ -93,9 +91,15 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
 class InstructorCourseListView(generics.ListAPIView):
     serializer_class = InstructorCourseSerializer
     permission_classes = [IsAuthenticated, IsInstructor]
+    pagination_class = None
 
     def get_queryset(self):
         return Course.objects.filter(instructor=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"count": queryset.count(), "results": serializer.data})
 
 
 class CategoryView(generics.ListAPIView):
