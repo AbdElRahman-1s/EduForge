@@ -181,16 +181,19 @@ function CourseDetails() {
           <div className="details-bot-flex">
 
             <div className="things-in-course">
-              <span>{courseDetails.topics[0] || 'Topic 1'}</span>
-              <span>{courseDetails.topics[1] || 'Topic 2'}</span>
-              <span>{courseDetails.topics[2] || 'Topic 3'}</span>
-              <span>{courseDetails.topics[3] || 'Topic 4'}</span>
+              {
+                courseDetails.topics.map((topic) => {
+                  return(
+                    <span>{topic}</span>
+                  )
+                })
+              }
             </div>
 
             <div className="bot-before-enroll-div">
               <h3>Course Curriculum</h3>
               {
-                isEnrolled ? <CurriculumAccordion />
+                isEnrolled ? <CurriculumAccordion sections={courseDetails?.sections || []} />
                   : (
                     <div className="Curriculum-div">
                       <span>Curriculum details coming soon.</span>
