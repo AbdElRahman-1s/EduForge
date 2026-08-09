@@ -33,6 +33,7 @@ function ManageCurriculum({ setSelected }) {
   const [selectedSectionId, setSelectedSectionId] = useState(null);
   const [selectedLessonId, setSelectedLessonId] = useState(null);
 
+  const [showMessage, setShowMessage] = useState(false);
 
   const courseId = localStorage.getItem("selectedCourseId");
 
@@ -73,12 +74,19 @@ function ManageCurriculum({ setSelected }) {
           }
         }
       )
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 1000);
 
       console.log(response.data);
       //تحديث ال state
       setSections(prev => [
         ...prev,
-        response.data
+        {
+          ...response.data,
+          lessons: [],
+        }
       ]);
 
     } catch (error) {
@@ -100,12 +108,19 @@ function ManageCurriculum({ setSelected }) {
           }
         }
       );
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 1000);
 
       console.log(response.data);
       setSections(prev =>
         prev.map(section =>
           section.id === sectionId
-            ? response.data
+            ? {
+              ...section,
+              ...response.data,
+            }
             : section
         )
       );
@@ -158,6 +173,11 @@ function ManageCurriculum({ setSelected }) {
           }
         }
       );
+      setShowMessage(true);
+
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 1000);
 
       console.log(response.data);
       setSections(prev =>
@@ -194,6 +214,10 @@ function ManageCurriculum({ setSelected }) {
           }
         }
       );
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 1000);
 
       setSections(prev =>
         prev.map(section =>
@@ -287,7 +311,7 @@ function ManageCurriculum({ setSelected }) {
     const order = newLessons.map(lesson => lesson.id);
 
     try {
-    const response =  await axios.patch(
+      const response = await axios.patch(
         `/api/sections/${sectionId}/lessons/reorder/`,
         { order },
         {
@@ -298,7 +322,7 @@ function ManageCurriculum({ setSelected }) {
       );
 
       console.log(response.data);
-      
+
 
     } catch (error) {
       console.error(error);
@@ -484,6 +508,8 @@ function ManageCurriculum({ setSelected }) {
               onChange={(e) => setSectionTitle(e.target.value)}
             />
 
+            <p className={showMessage ? 'showT' : 'hideT'}>added</p>
+
             <div className="modal-buttons-section">
               <button
                 className="btn-cancel-section"
@@ -516,7 +542,7 @@ function ManageCurriculum({ setSelected }) {
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
               />
-
+              <p className={showMessage ? 'showT' : 'hideT'}>edited</p>
               <div className="modal-buttons-section">
                 <button
                   className="btn-cancel-section"
@@ -615,6 +641,8 @@ function ManageCurriculum({ setSelected }) {
                   </div>
                 </div>
 
+                <p className={showMessage ? 'showT' : 'hideT'}>added</p>
+
                 <button
                   onClick={() => postAddLesson(selectedSectionId)}
                   type="button" className="save-btn-lesson">
@@ -705,7 +733,7 @@ function ManageCurriculum({ setSelected }) {
                     </label>
                   </div>
                 </div>
-
+                <p className={showMessage ? 'showT' : 'hideT'}>edited</p>
                 <button
                   onClick={() => patchEditLesson(selectedSectionId, selectedLessonId)}
                   type="button" className="save-btn-lesson">
