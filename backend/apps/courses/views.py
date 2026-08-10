@@ -87,6 +87,18 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
             return []
         return [IsAuthenticated(), IsInstructor(), IsCourseOwner()]
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+
+        course = self.get_object()
+
+        context["is_course_owner"] = (
+            self.request.user.is_authenticated
+            and course.instructor_id == self.request.user.id
+        )
+
+        return context
+
 
 class InstructorCourseListView(generics.ListAPIView):
     serializer_class = InstructorCourseSerializer
