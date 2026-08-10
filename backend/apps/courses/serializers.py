@@ -31,6 +31,10 @@ class LessonDetailSerializer(serializers.ModelSerializer):
     def get_video(self, obj):
         if obj.free:
             return obj.video
+
+        if self.context.get("is_course_owner"):
+            return obj.video
+
         return None
 
 
