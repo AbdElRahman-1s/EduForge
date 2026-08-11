@@ -1,13 +1,17 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+from apps.courses.models import Course
+
+user = get_user_model()
 
 
 # Create your models here.
 class Enrollment(models.Model):
     student = models.ForeignKey(
-        "users.User", on_delete=models.CASCADE, related_name="enrollments"
+        user, on_delete=models.CASCADE, related_name="enrollments"
     )
     course = models.ForeignKey(
-        "courses.Course", on_delete=models.CASCADE, related_name="enrollments"
+        Course, on_delete=models.CASCADE, related_name="enrollments"
     )
     enrolled_at = models.DateTimeField(auto_now_add=True)
 

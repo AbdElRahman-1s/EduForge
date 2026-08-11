@@ -1,5 +1,5 @@
 from django.contrib import admin
-from backend.apps.enrollments.models import Enrollment
+from .models import Enrollment
 
 
 # Register your models here.
