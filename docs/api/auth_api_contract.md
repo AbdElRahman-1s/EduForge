@@ -1,7 +1,7 @@
 # Authentication API Contract
 
 **Project:** EduForge
-**Version:** v3
+**Version:** v4
 **Base URL:** `http://localhost:8000/api/auth/`
 
 ---
@@ -43,6 +43,29 @@ Logout
 
 - Backend is responsible for setting and deleting the Refresh Cookie.
 
+## Token Lifetimes
+
+| Item                        | Value      |
+| --------------------------- | ---------- |
+| Access token lifetime       | 15 minutes |
+| Refresh token lifetime      | 15 days    |
+| Refresh **cookie** max-age  | 7 days     |
+
+> The cookie expires before the token it carries. After 7 days the browser drops
+> the cookie and the user must log in again, even though the refresh token
+> itself is still valid for 15 days.
+
+## Refresh Rotation
+
+`POST /api/auth/token/refresh/` issues a **new access token only**. It does not
+rotate the refresh token and does not update the cookie. The same refresh token
+stays valid until it expires or the user logs out.
+
+> The project's JWT settings enable `ROTATE_REFRESH_TOKENS` and
+> `BLACKLIST_AFTER_ROTATION`, but the refresh endpoint is a custom view that
+> does not use SimpleJWT's rotating serializer, so those settings have no effect
+> on this flow.
+
 ---
 
 # User Roles
@@ -54,7 +77,8 @@ EduForge currently supports two user roles.
 | `student`    | Can browse courses, enroll in courses, and track learning progress. |
 | `instructor` | Can create, update, and manage their own courses.                   |
 
-Future endpoints will enforce permissions based on the authenticated user's role.
+Endpoints enforce permissions based on the authenticated user's role. See
+`courses_api_contract.md` and `curriculum_api_contract.md`.
 
 ---
 
@@ -75,6 +99,32 @@ General errors:
   "detail": "Error message."
 }
 ```
+
+## Expired or Malformed Access Token
+
+Access-token failures are produced by SimpleJWT and carry extra keys beyond
+`detail`:
+
+```http
+401 Unauthorized
+```
+
+```json
+{
+  "detail": "Given token not valid for any token type",
+  "code": "token_not_valid",
+  "messages": [
+    {
+      "token_class": "AccessToken",
+      "token_type": "access",
+      "message": "Token is invalid"
+    }
+  ]
+}
+```
+
+Clients should treat any `401` on a protected endpoint as "refresh and retry",
+rather than matching on the message text.
 
 ---
 
@@ -102,13 +152,15 @@ POST /api/auth/register/
 
 ## Validation Rules
 
-| Field            | Rules                                                |
-| ---------------- | ---------------------------------------------------- |
-| username         | Required, unique, 3–30 characters                    |
-| email            | Required, valid email, unique                        |
-| password         | Required, validated using Django password validators |
-| confirm_password | Must match password                                  |
-| role             | Required, must be either `student` or `instructor`   |
+| Field            | Rules                                                            |
+| ---------------- | ---------------------------------------------------------------- |
+| username         | Required, unique, letters/numbers/underscores only, 3–30 chars    |
+| email            | Required, valid email, unique                                     |
+| password         | Required, validated using Django password validators              |
+| confirm_password | Must match password                                               |
+| role             | Optional, `student` or `instructor`, defaults to `student`         |
+
+> `role` is **not** required. Omitting it creates a student account.
 
 ---
 
@@ -130,9 +182,14 @@ POST /api/auth/register/
 }
 ```
 
+Registration does not log the user in. No tokens are issued and no cookie is
+set — the client must call `POST /api/auth/login/` next.
+
 ---
 
 ## Error Cases
+
+All registration errors return `400 Bad Request`.
 
 ### Passwords Don't Match
 
@@ -150,7 +207,50 @@ POST /api/auth/register/
 }
 ```
 
-Validation errors for username, email, and password remain unchanged.
+### Invalid Username
+
+Wrong length or disallowed characters:
+
+```json
+{
+  "username": [
+    "Username can only contain letters, numbers, and underscores (3-30 chars)"
+  ]
+}
+```
+
+Characters rejected by Django's own username validator are reported first, with
+a different message:
+
+```json
+{
+  "username": [
+    "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters."
+  ]
+}
+```
+
+### Duplicate Email
+
+```json
+{
+  "email": ["user with this email already exists."]
+}
+```
+
+### Weak Password
+
+Django's password validators return every failure at once:
+
+```json
+{
+  "password": [
+    "This password is too short. It must contain at least 8 characters.",
+    "This password is too common.",
+    "This password is entirely numeric."
+  ]
+}
+```
 
 ---
 
@@ -198,13 +298,18 @@ POST /api/auth/login/
 ```http
 Set-Cookie:
 refresh=<jwt_refresh_token>;
+Max-Age=604800;
 HttpOnly;
 Secure;
 SameSite=Lax;
 Path=/api/auth/
 ```
 
-> During local development, `Secure` may be disabled.
+> `Secure` is set only when `DEBUG` is off. During local development the flag is
+> omitted.
+
+Because `Path` is `/api/auth/`, the cookie is sent only to auth endpoints. It is
+not attached to course or enrollment requests.
 
 ---
 
@@ -212,13 +317,29 @@ Path=/api/auth/
 
 ### Invalid Credentials
 
+```http
+401 Unauthorized
+```
+
 ```json
 {
   "detail": "Invalid email or password."
 }
 ```
 
-Other validation errors remain unchanged.
+The same response is returned for an unknown email and for a wrong password.
+
+### Missing or Malformed Fields
+
+```http
+400 Bad Request
+```
+
+```json
+{
+  "email": ["This field is required."]
+}
+```
 
 ---
 
@@ -256,11 +377,17 @@ None.
 }
 ```
 
+No new cookie is set — see "Refresh Rotation" above.
+
 ---
 
 ## Error Cases
 
 ### Refresh Cookie Missing
+
+```http
+401 Unauthorized
+```
 
 ```json
 {
@@ -268,7 +395,11 @@ None.
 }
 ```
 
-### Invalid or Expired Refresh Token
+### Invalid, Expired, or Blacklisted Refresh Token
+
+```http
+401 Unauthorized
+```
 
 ```json
 {
@@ -293,6 +424,8 @@ Authorization: Bearer <access_token>
 ```
 
 The browser automatically includes the Refresh Cookie.
+
+Both credentials are required: a valid access token **and** the refresh cookie.
 
 ---
 
@@ -326,13 +459,18 @@ SameSite=Lax;
 Path=/api/auth/
 ```
 
-The backend blacklists the Refresh Token and removes the cookie from the browser.
+The backend blacklists the Refresh Token and removes the cookie from the
+browser.
 
 ---
 
 ## Error Cases
 
 ### Missing Refresh Cookie
+
+```http
+401 Unauthorized
+```
 
 ```json
 {
@@ -342,6 +480,10 @@ The backend blacklists the Refresh Token and removes the cookie from the browser
 
 ### Invalid Refresh Token
 
+```http
+401 Unauthorized
+```
+
 ```json
 {
   "detail": "Invalid refresh token."
@@ -350,11 +492,18 @@ The backend blacklists the Refresh Token and removes the cookie from the browser
 
 ### Missing Access Token
 
+```http
+401 Unauthorized
+```
+
 ```json
 {
   "detail": "Authentication credentials were not provided."
 }
 ```
+
+> When the access token is missing or expired, logout fails and the cookie is
+> left in place. Clients should refresh the access token first, then log out.
 
 ---
 
@@ -392,11 +541,22 @@ Authorization: Bearer <access_token>
 }
 ```
 
+`first_name` and `last_name` are empty strings unless set through the Django
+admin — registration does not collect them.
+
+`date_joined` is the account's `created_at` timestamp.
+
+This endpoint is read-only. There is no profile update endpoint yet.
+
 ---
 
 ## Error Cases
 
 ### Missing Access Token
+
+```http
+401 Unauthorized
+```
 
 ```json
 {
@@ -406,8 +566,20 @@ Authorization: Bearer <access_token>
 
 ### Invalid or Expired Access Token
 
-```json
-{
-  "detail": "Token is invalid or expired."
-}
+```http
+401 Unauthorized
 ```
+
+See "Expired or Malformed Access Token" above for the exact body.
+
+---
+
+# Future Milestones
+
+Intentionally **out of scope** for this contract:
+
+- Email verification
+- Password reset / change
+- Profile update and avatar upload
+- Social login
+- Refresh token rotation on the refresh endpoint

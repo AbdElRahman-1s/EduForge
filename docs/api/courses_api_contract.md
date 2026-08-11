@@ -1,14 +1,15 @@
 # Courses API Contract
 
 **Project:** EduForge  
-**Version:** v2  
+**Version:** v3  
 **Base URL:** `http://localhost:8000/api/`
 
 ---
 
 # Overview
 
-This contract documents the current courses app API for public course browsing and instructor-managed course operations.
+This contract documents the current courses app API for public course browsing
+and instructor-managed course operations.
 
 ## Supported Endpoints
 
@@ -16,10 +17,15 @@ This contract documents the current courses app API for public course browsing a
 - `POST /api/courses/`
 - `GET /api/courses/{id}/`
 - `PATCH /api/courses/{id}/`
+- `PUT /api/courses/{id}/`
 - `DELETE /api/courses/{id}/`
 - `GET /api/courses/mine/`
 - `GET /api/categories/`
 - `GET /api/topics/`
+
+Curriculum management (sections and lessons) is documented in
+`curriculum_api_contract.md`. Enrollment is documented in
+`enrollments_api_contract.md`.
 
 ---
 
@@ -35,10 +41,51 @@ This contract documents the current courses app API for public course browsing a
 - Authenticated instructors can create courses.
 - Authenticated instructors can view their own courses via `/api/courses/mine/`.
 - Only the owning instructor can update or delete a course.
+- Only authenticated instructors can list categories and topics.
 
 ## Student Access
 
-- Students cannot create, update, delete courses, or access `/api/courses/mine/`.
+- Students cannot create, update, or delete courses.
+- Students cannot access `/api/courses/mine/`, `/api/categories/`, or
+  `/api/topics/`.
+
+## Permission Errors
+
+Non-instructor callers (students) receive:
+
+```http
+403 Forbidden
+```
+
+```json
+{
+  "detail": "Only instructors can perform this action."
+}
+```
+
+An instructor acting on a course they do not own receives:
+
+```http
+403 Forbidden
+```
+
+```json
+{
+  "detail": "You can only modify your own courses."
+}
+```
+
+Anonymous callers on a protected endpoint receive:
+
+```http
+401 Unauthorized
+```
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
 
 ---
 
@@ -62,9 +109,25 @@ General errors:
 
 ---
 
+# Serializer Shapes
+
+Two different course shapes are returned depending on the operation.
+
+| Operation                | `category`      | `topics`          |
+| ------------------------ | --------------- | ----------------- |
+| List / detail / mine     | category `name` | list of topic names |
+| Create / update response | category `id`   | list of topic ids |
+
+Write operations echo back IDs because they return the write serializer. Read
+operations return human-readable names. Clients must not assume one shape for
+both.
+
+---
+
 # Pagination
 
-List endpoints use page-based pagination.
+`GET /api/courses/`, `GET /api/categories/`, and `GET /api/topics/` use
+page-based pagination.
 
 Default page size: `10`
 
@@ -78,6 +141,23 @@ Example response:
   "results": []
 }
 ```
+
+Requesting a page beyond the last one returns:
+
+```http
+404 Not Found
+```
+
+```json
+{
+  "detail": "Invalid page."
+}
+```
+
+`GET /api/courses/mine/` is **not** paginated — see section 6.
+
+> The published-courses queryset has no explicit ordering, so page boundaries
+> are not guaranteed stable across requests. Ordering is a future improvement.
 
 ---
 
@@ -96,7 +176,9 @@ None required.
 ## Behavior
 
 - Returns only courses where `published: true`.
-- Unpublished courses do not appear in this endpoint.
+- Unpublished courses do not appear in this endpoint, not even for their owner.
+- No filtering, search, or ordering query parameters are supported yet. Only
+  `page` is honoured.
 
 ## Success
 
@@ -116,7 +198,7 @@ None required.
       "category": "Programming",
       "level": "beginner",
       "price": "0.00",
-      "thumbnail": null,
+      "thumbnail": "http://localhost:8000/media/courses/django.png",
       "topics": ["Python", "Django"],
       "badge": "new",
       "instructor": {
@@ -131,6 +213,8 @@ None required.
 }
 ```
 
+`thumbnail` is an absolute URL, or `null` when no image has been uploaded.
+
 ---
 
 # 2. Get Course Detail
@@ -143,17 +227,22 @@ GET /api/courses/{id}/
 
 ## Authentication
 
-None required.
-Authentication is optional. Authenticated instructors can access their own unpublished courses.
+Optional. Authenticated instructors can access their own unpublished courses.
 
 ## Behavior
 
 - Published courses are publicly accessible.
-- Course owners can retrieve their own courses regardless of publication status.
-- Non-owners and anonymous users receive `404 Not Found` when requesting an unpublished course.
+- An authenticated **instructor** can retrieve their own courses regardless of
+  publication status.
+- Everyone else — anonymous users, students, and other instructors — receives
+  `404 Not Found` for an unpublished course.
 - Sections are returned ordered by their `order` field.
 - Lessons are returned ordered by their `order` field.
-- The `video` field is exposed only for free-preview lessons. Locked lessons return `null`.
+- The `video` field is returned when the lesson is a free preview **or** when
+  the requester is the course owner. Otherwise it is `null`.
+
+> Enrolled students do not currently unlock locked lesson videos. That belongs
+> to a future milestone.
 
 ## Success
 
@@ -165,11 +254,10 @@ Authentication is optional. Authenticated instructors can access their own unpub
 {
   "id": 1,
   "title": "Backend Development with Django",
-  "description": "Learn to build production APIs with Django REST Framework.",
   "category": "Programming",
   "level": "beginner",
   "price": "0.00",
-  "thumbnail": null,
+  "thumbnail": "http://localhost:8000/media/courses/django.png",
   "topics": ["Python", "Django"],
   "badge": "new",
   "instructor": {
@@ -179,8 +267,9 @@ Authentication is optional. Authenticated instructors can access their own unpub
   },
   "published": true,
   "created_at": "2026-07-01T10:00:00Z",
-  "total_lessons": 6,
-  "total_duration_seconds": 4920,
+  "description": "Learn to build production APIs with Django REST Framework.",
+  "total_lessons": 2,
+  "total_duration_seconds": 600,
   "sections": [
     {
       "id": 1,
@@ -204,31 +293,25 @@ Authentication is optional. Authenticated instructors can access their own unpub
           "video": null
         }
       ]
-    },
-    {
-      "id": 2,
-      "title": "Building APIs",
-      "order": 2,
-      "lessons": [
-        {
-          "id": 3,
-          "title": "Models",
-          "duration_seconds": 600,
-          "order": 1,
-          "free": false,
-          "video": null
-        },
-        {
-          "id": 4,
-          "title": "Serializers",
-          "duration_seconds": 720,
-          "order": 2,
-          "free": false,
-          "video": null
-        }
-      ]
     }
   ]
+}
+```
+
+`total_lessons` and `total_duration_seconds` are aggregated across all sections
+and default to `0` for an empty curriculum.
+
+## Error Cases
+
+### Unpublished or Missing Course
+
+```http
+404 Not Found
+```
+
+```json
+{
+  "detail": "No Course matches the given query."
 }
 ```
 
@@ -270,14 +353,19 @@ Required. Must be authenticated as an instructor.
 
 | Field         | Rules                                                          |
 | ------------- | -------------------------------------------------------------- |
-| `title`       | Required, 3–150 characters                                     |
-| `description` | Required                                                       |
+| `title`       | Required, non-blank, max 150 characters                        |
+| `description` | Required, non-blank                                            |
 | `category`    | Required, must reference an existing category ID               |
 | `level`       | Required, one of `beginner`, `intermediate`, `advanced`, `all` |
-| `price`       | Optional, must be non-negative                                 |
+| `price`       | Optional, max 7 digits with 2 decimal places                   |
 | `topics`      | Optional, list of topic IDs                                    |
 | `badge`       | Optional, one of `bestseller`, `hot`, `new`, `none`            |
-| `published`   | Optional boolean                                               |
+| `published`   | Optional boolean, defaults to `false`                          |
+
+- No minimum length is enforced on `title` — a 2-character title is accepted.
+- Leading/trailing whitespace is trimmed; a whitespace-only value is rejected
+  with `"This field may not be blank."`
+- `badge` defaults to `none` and `price` defaults to `null` when omitted.
 
 ## Success
 
@@ -308,16 +396,32 @@ If `published` is set to `true`, the API requires:
 - a thumbnail
 - at least one topic
 
-Otherwise it returns validation errors.
+Otherwise it returns:
+
+```http
+400 Bad Request
+```
+
+```json
+{
+  "price": ["Price is required to publish the course."],
+  "thumbnail": ["A thumbnail is required to publish the course."],
+  "topics": ["At least one topic must be selected to publish."]
+}
+```
+
+These rules also apply to `PATCH` and `PUT`, evaluated against the merged
+result of the existing course and the incoming payload.
 
 ---
 
 # 4. Update Course
 
-## Endpoint
+## Endpoints
 
 ```http
 PATCH /api/courses/{id}/
+PUT   /api/courses/{id}/
 ```
 
 ## Authentication
@@ -326,12 +430,27 @@ Required. Only the owning instructor can update the course.
 
 ## Request
 
-Any subset of the writable fields may be provided.
+`PATCH` accepts any subset of the writable fields.
 
 ```json
 {
   "title": "Advanced Backend Development with Django",
   "published": true
+}
+```
+
+`PUT` is a full replacement and requires every non-optional field
+(`title`, `description`, `category`, `level`). A partial `PUT` returns:
+
+```http
+400 Bad Request
+```
+
+```json
+{
+  "description": ["This field is required."],
+  "category": ["This field is required."],
+  "level": ["This field is required."]
 }
 ```
 
@@ -349,7 +468,7 @@ Any subset of the writable fields may be provided.
   "category": 1,
   "level": "beginner",
   "price": "49.99",
-  "thumbnail": null,
+  "thumbnail": "http://localhost:8000/media/courses/django.png",
   "topics": [1, 2],
   "badge": "new",
   "published": true
@@ -376,6 +495,8 @@ Required. Only the owning instructor can delete the course.
 204 No Content
 ```
 
+Deleting a course also deletes its sections, lessons, and enrollments.
+
 ---
 
 # 6. My Courses
@@ -392,7 +513,11 @@ Required. Must be authenticated as an instructor.
 
 ## Behavior
 
-Returns the authenticated instructor’s own courses, including unpublished drafts.
+Returns the authenticated instructor's own courses, including unpublished
+drafts.
+
+This endpoint is **not paginated**. It returns every owned course in one
+response and the payload has no `next` or `previous` keys.
 
 ## Success
 
@@ -402,9 +527,7 @@ Returns the authenticated instructor’s own courses, including unpublished draf
 
 ```json
 {
-  "count": 2,
-  "next": null,
-  "previous": null,
+  "count": 1,
   "results": [
     {
       "id": 12,
@@ -462,6 +585,9 @@ Required. Must be authenticated as an instructor.
 }
 ```
 
+Categories are created through the Django admin. There is no create, update, or
+delete endpoint.
+
 ---
 
 # 8. List Topics
@@ -497,4 +623,26 @@ Required. Must be authenticated as an instructor.
 }
 ```
 
-\*\*\* End Patch
+Topics are created through the Django admin. There is no create, update, or
+delete endpoint.
+
+---
+
+# Known Issues
+
+- **A negative `price` returns `500`.** The serializer does not validate the
+  lower bound, so the database check constraint
+  (`price_must_be_non_negative`) raises an `IntegrityError` instead of a `400`
+  validation error. Needs a `min_value=0` on the serializer field.
+
+---
+
+# Future Milestones
+
+Intentionally **out of scope** for this contract:
+
+- Filtering, search, and ordering on the course list
+- Stable ordering for paginated course results
+- Category and topic management endpoints
+- Ratings and reviews
+- Enrollment counts on the course payloads
