@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # Apps
     "apps.accounts",
     "apps.courses",
+    "apps.enrollments",
     # Packages
     "rest_framework",
     "rest_framework_simplejwt",
