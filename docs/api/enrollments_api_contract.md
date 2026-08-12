@@ -1,14 +1,15 @@
 # Enrollments API Contract
 
 **Project:** EduForge  
-**Version:** v1  
+**Version:** v2  
 **Base URL:** `http://localhost:8000/api/`
 
 ---
 
 # Scope
 
-This contract covers student enrollment into a course.
+This contract covers student enrollment into a course and listing the
+authenticated user's own enrollments.
 
 Only **free enrollment** is implemented. Paid enrollment requires the payments
 milestone and is rejected by this endpoint today.
@@ -16,6 +17,7 @@ milestone and is rejected by this endpoint today.
 ## Supported Endpoints
 
 - `POST /api/courses/{course_id}/enroll/`
+- `GET /api/enrollments/mine/`
 
 ---
 
@@ -34,8 +36,9 @@ An enrollment is a link between a user and a course.
 
 Enrollments are ordered newest-first (`-enrolled_at`) at the model level.
 
-There is no `status` or `progress` field yet. Progress tracking is a future
-milestone.
+There is no `status` or `progress` field on the model yet. The
+`progress_percent` value exposed by `GET /api/enrollments/mine/` is a hardcoded
+placeholder — see section 2.
 
 ---
 
@@ -243,7 +246,160 @@ concurrent duplicate requests produce the same message rather than a `500`.
 }
 ```
 
-Only `POST` is supported. There is no way to read or cancel an enrollment yet.
+Only `POST` is supported on this route.
+
+---
+
+# 2. List My Enrollments
+
+## Endpoint
+
+```http
+GET /api/enrollments/mine/
+```
+
+## Authentication
+
+Required.
+
+```http
+Authorization: Bearer <access_token>
+```
+
+Any authenticated user may call this endpoint. It is not restricted to the
+`student` role — an instructor who enrolled in another instructor's course sees
+that enrollment here.
+
+## Behavior
+
+- Returns only the authenticated user's own enrollments. There is no way to read
+  another user's enrollments.
+- Ordered newest-first by `enrolled_at`.
+- Courses that have since been **unpublished** are still returned. Enrollment
+  survives the course leaving the catalogue.
+- This endpoint is **not paginated**. It returns every enrollment in one
+  response and the payload has no `next` or `previous` keys.
+
+## Success
+
+```http
+200 OK
+```
+
+```json
+{
+  "count": 2,
+  "results": [
+    {
+      "id": 1,
+      "title": "Backend Development with Django",
+      "thumbnail": "http://localhost:8000/media/courses/django.png",
+      "badge": "new",
+      "category": "Programming",
+      "level": "beginner",
+      "total_lessons": 4,
+      "total_duration_seconds": 400,
+      "instructor": {
+        "id": 4,
+        "username": "abdallah",
+        "email": "abdallah@example.com"
+      },
+      "enrolled_at": "2026-08-12T07:19:48.088836Z",
+      "progress_percent": 0
+    },
+    {
+      "id": 2,
+      "title": "Intro to React",
+      "thumbnail": null,
+      "badge": "none",
+      "category": "Programming",
+      "level": "beginner",
+      "total_lessons": 0,
+      "total_duration_seconds": 0,
+      "instructor": {
+        "id": 4,
+        "username": "abdallah",
+        "email": "abdallah@example.com"
+      },
+      "enrolled_at": "2026-08-12T07:19:48.089273Z",
+      "progress_percent": 0
+    }
+  ]
+}
+```
+
+Empty result:
+
+```json
+{
+  "count": 0,
+  "results": []
+}
+```
+
+## Field Reference
+
+| Field                    | Notes                                                       |
+| ------------------------ | ----------------------------------------------------------- |
+| `id`                     | **The course ID, not the enrollment ID** — see warning below |
+| `title`                  | Course title                                                |
+| `thumbnail`              | Absolute URL, or `null` when no image was uploaded          |
+| `badge`                  | One of `bestseller`, `hot`, `new`, `none`                    |
+| `category`               | Category **name**                                            |
+| `level`                  | One of `beginner`, `intermediate`, `advanced`, `all`         |
+| `total_lessons`          | Lesson count across all sections; `0` for an empty curriculum |
+| `total_duration_seconds` | Summed lesson duration; `0` for an empty curriculum          |
+| `instructor`             | Nested `{id, username, email}`                                |
+| `enrolled_at`            | When the user enrolled                                       |
+| `progress_percent`       | Always `0` — placeholder, see below                          |
+
+> **`id` is the course ID.** The payload is shaped as a course card for the
+> "My Learning" view, so `id` can be used directly with
+> `GET /api/courses/{id}/`. The enrollment's own primary key is **not exposed
+> anywhere** in this response, so there is currently no way for a client to
+> address an individual enrollment.
+
+> **`progress_percent` is hardcoded to `0`.** No progress is tracked yet. Do not
+> build client logic that expects this value to change.
+
+The payload deliberately omits `price`, `published`, and `description`. Clients
+that need those must fetch `GET /api/courses/{id}/`.
+
+## Error Cases
+
+### Missing Access Token
+
+```http
+401 Unauthorized
+```
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+### Invalid or Expired Access Token
+
+```http
+401 Unauthorized
+```
+
+See the token error body in section 1.
+
+### Wrong Method
+
+```http
+405 Method Not Allowed
+```
+
+```json
+{
+  "detail": "Method \"POST\" not allowed."
+}
+```
+
+Only `GET` is supported. There is no unenroll endpoint.
 
 ---
 
@@ -253,6 +409,9 @@ Only `POST` is supported. There is no way to read or cancel an enrollment yet.
   compares `price > 0` without a null guard. Publishing through the API always
   sets a price, so this is only reachable for courses published through the
   Django admin or directly in the database.
+- **`GET /api/enrollments/mine/` exposes no enrollment identifier.** `id` is the
+  course ID, so an unenroll endpoint cannot be addressed by enrollment ID
+  without changing this payload.
 
 ---
 
@@ -260,8 +419,9 @@ Only `POST` is supported. There is no way to read or cancel an enrollment yet.
 
 Intentionally **out of scope** for this contract:
 
-- Listing the authenticated user's enrollments
 - Unenrolling / cancellation
+- Pagination on `GET /api/enrollments/mine/`
+- Real `progress_percent` values
 - An `is_enrolled` flag on the Course Details response
 - Paid enrollment, checkout, and payment webhooks
 - Lesson progress and course completion
