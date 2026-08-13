@@ -108,6 +108,7 @@ class CourseListSerializer(serializers.ModelSerializer):
     category = serializers.ReadOnlyField(source="category.name")
     topics = serializers.SlugRelatedField(slug_field="name", read_only=True, many=True)
     instructor = InstructorSerializer(read_only=True)
+    is_enrolled = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -122,8 +123,12 @@ class CourseListSerializer(serializers.ModelSerializer):
             "badge",
             "instructor",
             "published",
+            "is_enrolled",
             "created_at",
         ]
+
+    def get_is_enrolled(self, obj):
+        return obj.id in self.context.get("enrolled_course_ids")
 
 
 class CourseDetailSerializer(CourseListSerializer):

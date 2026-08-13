@@ -29,9 +29,13 @@ User = get_user_model()
 class CourseListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
+        queryset = Course.objects.select_related(
+            "instructor", "category"
+        ).prefetch_related("topics")
+
         if self.request.method == "GET":
-            return Course.objects.filter(published=True)
-        return Course.objects.all()
+            return queryset.filter(published=True)
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -45,6 +49,18 @@ class CourseListCreateView(generics.ListCreateAPIView):
         if self.request.method == "GET":
             return []
         return [IsAuthenticated(), IsInstructor()]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        enrolled_course_ids = set()
+
+        if self.request.user.is_authenticated:
+            enrolled_course_ids = self.request.user.enrollments.values_list(
+                "course_id", flat=True
+            )
+
+        context["enrolled_course_ids"] = enrolled_course_ids
+        return context
 
 
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
