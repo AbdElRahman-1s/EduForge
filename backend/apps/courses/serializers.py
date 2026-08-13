@@ -32,7 +32,7 @@ class LessonDetailSerializer(serializers.ModelSerializer):
         if obj.free:
             return obj.video
 
-        if self.context.get("is_course_owner"):
+        if self.context.get("is_course_owner") or self.context.get("is_enrolled"):
             return obj.video
 
         return None
