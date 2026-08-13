@@ -110,8 +110,10 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
+        if self.request.method != "GET":
+            return context
+
         course = self.course
-        # course = self.get_object()
 
         context["is_course_owner"] = (
             self.request.user.is_authenticated
