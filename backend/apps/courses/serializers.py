@@ -128,7 +128,10 @@ class CourseListSerializer(serializers.ModelSerializer):
         ]
 
     def get_is_enrolled(self, obj):
-        return obj.id in self.context.get("enrolled_course_ids")
+        if "is_enrolled" in self.context:
+            return self.context["is_enrolled"]
+        
+        return obj.id in self.context.get("enrolled_course_ids", [])
 
 
 class CourseDetailSerializer(CourseListSerializer):
