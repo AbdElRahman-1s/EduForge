@@ -127,10 +127,12 @@ class CourseListSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
+    
+
     def get_is_enrolled(self, obj):
         if "is_enrolled" in self.context:
             return self.context["is_enrolled"]
-        
+
         return obj.id in self.context.get("enrolled_course_ids", [])
 
 
