@@ -787,6 +787,40 @@ class CourseDetailCurriculumTests(CurriculumAPITestCase):
         self.assertEqual(lessons["Introduction"]["video"], self.free_lesson.video)
         self.assertIsNone(lessons["Environment Setup"]["video"])
 
+    def test_enrolled_student_sees_all_lesson_videos(self):
+        from apps.enrollments.models import Enrollment
+
+        Enrollment.objects.create(student=self.student, course=self.course)
+        self._auth_as(self.student)
+
+        lessons = self._lessons_by_title(self._get_detail())
+
+        self.assertEqual(lessons["Introduction"]["video"], self.free_lesson.video)
+        self.assertEqual(lessons["Environment Setup"]["video"], self.locked_lesson.video)
+
+    def test_course_owner_sees_all_lesson_videos(self):
+        self._auth_as(self.instructor)
+
+        lessons = self._lessons_by_title(self._get_detail())
+
+        self.assertEqual(lessons["Introduction"]["video"], self.free_lesson.video)
+        self.assertEqual(lessons["Environment Setup"]["video"], self.locked_lesson.video)
+
+    def test_enrollment_visibility_does_not_leak_between_users(self):
+        from apps.enrollments.models import Enrollment
+
+        Enrollment.objects.create(student=self.student, course=self.course)
+        self._auth_as(self.student)
+        enrolled_lessons = self._lessons_by_title(self._get_detail())
+
+        self._auth_as(self.other_instructor)
+        non_enrolled_lessons = self._lessons_by_title(self._get_detail())
+
+        self.assertEqual(
+            enrolled_lessons["Environment Setup"]["video"], self.locked_lesson.video
+        )
+        self.assertIsNone(non_enrolled_lessons["Environment Setup"]["video"])
+
     def test_locked_video_url_is_absent_from_the_raw_response_body(self):
         """The locked URL must not leak anywhere in the payload, not just be nulled."""
         response = self.client.get(self.detail_url)
