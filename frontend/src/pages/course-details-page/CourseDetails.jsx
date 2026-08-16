@@ -26,7 +26,7 @@ import { AuthContext } from "../../context/AuthContext";
 
 function CourseDetails() {
   const [courseDetails, setCourseDetails] = useState();
-
+  const [enrollMessage, setEnrollMessage] = useState("");
   const { accessToken } = useContext(AuthContext);
 
 
@@ -77,19 +77,26 @@ function CourseDetails() {
 
 
       const response2 = await axios.get(
-      `/api/courses/${id}/`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+        `/api/courses/${id}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
-    setCourseDetails(response2.data);
+      setCourseDetails(response2.data);
+
+      setEnrollMessage("Enrolled successfully!");
 
     } catch (error) {
-      console.log(error.response?.data);
+      console.log("ERROR:", error);
+      console.log("DATA:", error.response?.data);
+      console.log("DETAIL:", error.response?.data?.detail);
 
+      setEnrollMessage(
+        error.response?.data?.detail || "Something went wrong. Please try again."
+      );
     }
 
   }
@@ -181,13 +188,19 @@ function CourseDetails() {
                   <h2 className="price-details">${courseDetails.price}</h2>
                   <div className="btns-details">
                     <button
-                      onClick={() => postEnrollCourse(courseDetails.is_enrolled)}
+                      onClick={() => postEnrollCourse()}
                       className="purple-btn">{
                         courseDetails.is_enrolled
                           ? `Continue Learning >`
                           : `Enroll Now - ${courseDetails.price}`}</button>
                     <button className="white-btn">Try free preview</button>
                   </div>
+
+                  {enrollMessage && (
+                    <p className="enroll-messages">
+                      {enrollMessage}
+                    </p>
+                  )}
 
                   <div className="more-benefits">
                     <div>
