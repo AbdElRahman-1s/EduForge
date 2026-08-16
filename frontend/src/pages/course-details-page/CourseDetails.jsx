@@ -15,9 +15,10 @@ import { LuCircleCheckBig } from "react-icons/lu";
 import './course-details.css';
 
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import CurriculumAccordion from "../../components/Course-Curriculum-component/CurriculumAccordion";
+import { AuthContext } from "../../context/AuthContext";
 
 
 
@@ -25,8 +26,8 @@ import CurriculumAccordion from "../../components/Course-Curriculum-component/Cu
 
 function CourseDetails() {
   const [courseDetails, setCourseDetails] = useState();
-  const [isEnrolled, setIsEnrolled] = useState(false);
 
+  const { accessToken } = useContext(AuthContext);
 
 
 
@@ -35,7 +36,13 @@ function CourseDetails() {
   useEffect(() => {
     async function fetchCourseDetails() {
       try {
-        const response = await axios.get(` /api/courses/${id}/`);
+        const response = await axios.get(`/api/courses/${id}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            }
+          }
+        );
 
 
         setCourseDetails(response.data);
@@ -50,7 +57,43 @@ function CourseDetails() {
     fetchCourseDetails();
 
 
-  }, [id])
+  }, [accessToken, id]);
+
+
+  async function postEnrollCourse() {
+
+    try {
+
+      const response = await axios.post(`/api/courses/${id}/enroll/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      console.log(response.data);
+
+
+      const response2 = await axios.get(
+      `/api/courses/${id}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    setCourseDetails(response2.data);
+
+    } catch (error) {
+      console.log(error.response?.data);
+
+    }
+
+  }
+
 
 
 
@@ -137,7 +180,12 @@ function CourseDetails() {
                 <div className="bot-content">
                   <h2 className="price-details">${courseDetails.price}</h2>
                   <div className="btns-details">
-                    <button className="purple-btn">Enroll Now - ${courseDetails.price}</button>
+                    <button
+                      onClick={() => postEnrollCourse(courseDetails.is_enrolled)}
+                      className="purple-btn">{
+                        courseDetails.is_enrolled
+                          ? `Continue Learning >`
+                          : `Enroll Now - ${courseDetails.price}`}</button>
                     <button className="white-btn">Try free preview</button>
                   </div>
 
@@ -182,9 +230,9 @@ function CourseDetails() {
 
             <div className="things-in-course">
               {
-                courseDetails.topics.map((topic) => {
-                  return(
-                    <span>{topic}</span>
+                courseDetails.topics.map((topic, i) => {
+                  return (
+                    <span key={i}>{topic}</span>
                   )
                 })
               }
@@ -193,7 +241,8 @@ function CourseDetails() {
             <div className="bot-before-enroll-div">
               <h3>Course Curriculum</h3>
               {
-                isEnrolled ? <CurriculumAccordion sections={courseDetails?.sections || []} />
+                courseDetails.is_enrolled
+                  ? <CurriculumAccordion sections={courseDetails?.sections || []} />
                   : (
                     <div className="Curriculum-div">
                       <span>Curriculum details coming soon.</span>
