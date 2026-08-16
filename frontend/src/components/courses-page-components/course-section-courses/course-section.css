@@ -287,14 +287,14 @@
   cursor: pointer;
 }
 
-/* .details-course .course-action .continue-btn{
+.details-course .course-action .continue-btn{
   border: none;
   color: oklch(0.541 0.281 293.009);
   background-color: oklch(0.969 0.016 293.756);
   padding: 4px 12px;
   border-radius: 15px;
   cursor: pointer;
-} */
+}
 
 
 .next-prev-div {
