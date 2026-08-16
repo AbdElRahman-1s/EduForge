@@ -326,3 +326,12 @@
 a {
   text-decoration: none;
 }
+
+.enroll-messages{
+  color: rgb(255, 2, 2);
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  margin-top: -8px;
+  margin-bottom: 5px;
+}

@@ -4,91 +4,10 @@ import { IoTimeOutline, IoBookOutline } from "react-icons/io5";
 import './course-section.css';
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
+import { AuthContext } from "../../../context/AuthContext";
 
-
-// const detailsCourseCard = [
-//   {
-//     absolute: 'Bestseller',
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     category: 'Development',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     rating: '4.9',
-//     numrating: '(48.2k)',
-//     duration: '62',
-//     lessons: '148',
-//     level: 'Beginner',
-//     price: '$89',
-//     id: crypto.randomUUID()
-//   },
-//   {
-//     absolute: 'Bestseller',
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     category: 'Development',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     rating: '4.9(48.2k)',
-//     duration: '62',
-//     lessons: '148',
-//     level: 'Beginner',
-//     price: '$89',
-//     id: crypto.randomUUID()
-//   },
-//   {
-//     absolute: 'Bestseller',
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     category: 'Development',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     rating: '4.9(48.2k)',
-//     duration: '62',
-//     lessons: '148',
-//     level: 'Beginner',
-//     price: '$89',
-//     id: crypto.randomUUID()
-//   },
-//   {
-//     absolute: 'Bestseller',
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     category: 'Development',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     rating: '4.9(48.2k)',
-//     duration: '62',
-//     lessons: '148',
-//     level: 'Beginner',
-//     price: '$89',
-//     id: crypto.randomUUID()
-//   },
-//   {
-//     absolute: 'Bestseller',
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     category: 'Development',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     rating: '4.9(48.2k)',
-//     duration: '62',
-//     lessons: '148',
-//     level: 'Beginner',
-//     price: '$89',
-//     id: crypto.randomUUID()
-//   },
-//   {
-//     absolute: 'Bestseller',
-//     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-//     category: 'Development',
-//     title: 'Complete React & Next.js Development',
-//     instructor: 'Marcus Reid',
-//     rating: '4.9(48.2k)',
-//     duration: '62',
-//     lessons: '148',
-//     level: 'Beginner',
-//     price: '$89',
-//     id: crypto.randomUUID()
-//   }
-// ]
 
 
 
@@ -104,34 +23,40 @@ function CourseSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-
+  const { accessToken } = useContext(AuthContext);
 
 
 
   useEffect(() => {
 
-    
-  const fetchCourses = async (page = 1) => {
-    try {
-      const response = await axios.get(`/api/courses/?page=${page}`);
 
-      setCourses(response.data);
-      setNext(response.data.next);
-      setPrevious(response.data.previous);
-      setCurrentPage(page);
-      setTotalPages(Math.ceil(response.data.count / 10)); // 10 = Page Size
+    const fetchCourses = async (page = 1) => {
+      try {
+        const response = await axios.get(`/api/courses/?page=${page}`,
+          {
+            headers:{
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        );
 
-      console.log(response.data);
+        setCourses(response.data);
+        setNext(response.data.next);
+        setPrevious(response.data.previous);
+        setCurrentPage(page);
+        setTotalPages(Math.ceil(response.data.count / 10)); // 10 = Page Size
 
-    } catch (error) {
-      console.log(error);
-    }
-  };
+        console.log(response.data);
+
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
 
     fetchCourses(currentPage);
 
-  }, [currentPage]);
+  }, [currentPage,accessToken]);
 
 
   const pages = [];
@@ -144,7 +69,7 @@ function CourseSection() {
 
 
 
-    const categoryClasses = {
+  const categoryClasses = {
     bestseller: "best-category",
     hot: "hot-category",
     new: "new-category",
@@ -246,8 +171,8 @@ function CourseSection() {
                           </span>
 
                         </div>
-                        <button className="enroll-btn">
-                          Enroll
+                        <button className={courseCard.is_enrolled ? "continue-btn" : "enroll-btn"}>
+                          {courseCard.is_enrolled ? 'Continue' : 'Enroll'}
                         </button>
 
                       </div>
@@ -304,7 +229,7 @@ function CourseSection() {
       </div>
 
 
-    </section>
+    </section >
   )
 }
 
