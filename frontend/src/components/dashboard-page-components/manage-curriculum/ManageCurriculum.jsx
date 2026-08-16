@@ -39,7 +39,8 @@ function ManageCurriculum({ setSelected }) {
 
 
   const [sections, setSections] = useState([]);
-
+  const [isOrderChanged, setIsOrderChanged] = useState(false);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
 
 
 
@@ -276,44 +277,37 @@ function ManageCurriculum({ setSelected }) {
 
 
 
-  const handleReorderSection = async (newSections) => {
+  const handleReorderSection = (newSections) => {
     setSections(newSections);
-
-    const order = newSections.map(section => section.id);
-
-    try {
-      const response = await axios.patch(
-        `/api/courses/${courseId}/sections/reorder/`,
-        { order },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          }
-        }
-      );
-
-      console.log(response.data);
-
-
-    } catch (error) {
-      console.log(error);
-
-    }
-
+    setIsOrderChanged(true);
   };
 
 
-  const handleLessonReorder = async (sectionId, newLessons) => {
+  const handleLessonReorder = (sectionId, newLessons) => {
     setSections(prev =>
-      prev.map(sec => sec.id === sectionId ? { ...sec, lessons: newLessons } : sec)
+      prev.map(sec =>
+        sec.id === sectionId
+          ? { ...sec, lessons: newLessons }
+          : sec
+      )
     );
 
-    const order = newLessons.map(lesson => lesson.id);
+    setIsOrderChanged(true);
+  };
+
+
+  const saveOrder = async () => {
+    if (!isOrderChanged) return;
 
     try {
-      const response = await axios.patch(
-        `/api/sections/${sectionId}/lessons/reorder/`,
-        { order },
+      setIsSavingOrder(true);
+
+      // Save sections order
+      const sectionOrder = sections.map(section => section.id);
+
+      await axios.patch(
+        `/api/courses/${courseId}/sections/reorder/`,
+        { order: sectionOrder },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -321,15 +315,35 @@ function ManageCurriculum({ setSelected }) {
         }
       );
 
-      console.log(response.data);
+      // Save lessons order
+      for (const section of sections) {
+        const lessonOrder = section.lessons.map(lesson => lesson.id);
 
+        await axios.patch(
+          `/api/sections/${section.id}/lessons/reorder/`,
+          { order: lessonOrder },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+      }
+
+      setIsOrderChanged(false);
+
+      setShowMessage(true);
+
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 1000);
 
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSavingOrder(false);
     }
-
   };
-
 
 
 
@@ -480,10 +494,20 @@ function ManageCurriculum({ setSelected }) {
           ))}
         </Reorder.Group>
 
-        {/* 🟢 تصحيح: طلعنا زرار الحفظ خارج الـ Reorder.Group */}
+
         <div className="save-order-bar">
-          <button className="save-order-btn">
-            <Check size={16} /> Save Order
+          <button
+            className="save-order-btn"
+            onClick={saveOrder}
+            disabled={!isOrderChanged || isSavingOrder}
+          >
+            <Check size={16} />
+            {isSavingOrder
+              ? 'Saving...'
+              : showMessage
+                ? 'Saved successfully'
+                : 'Save Order'
+            }
           </button>
           <span className="last-saved-text">Last saved: 2 minutes ago</span>
         </div>
