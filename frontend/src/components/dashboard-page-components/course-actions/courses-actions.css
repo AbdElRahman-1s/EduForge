@@ -21,19 +21,29 @@
   padding-bottom: 10px;
   margin-bottom: 5px;
   border-bottom: 1px solid rgb(241, 241, 241);
-  gap: 30px;
 }
+
+.category-course,
+.students-course,
+.review-course,
+.rate-course,
+.lessons-course,
+.duration-course,
+.price-course {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+}
+
 
 .mid-header {
   display: flex;
   align-items: center;
-  gap: 140px;
-  margin-left: 228px;
+  margin-left: 145px;
+  gap: 12px;
 }
 
-.right-header {
-  margin-right: 25px;
-}
 
 
 .course-details {
@@ -54,8 +64,7 @@
 .left-details-dash {
   display: flex;
   align-items: center;
-  gap: 15px;
-  width: 350px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -69,7 +78,7 @@
 .left-details-dash .title-course {
   font-weight: 500;
   font-family: Arial, Helvetica, sans-serif;
-  width: 210px;
+  width: 200px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -85,7 +94,7 @@
 .mid-details-dash {
   display: flex;
   align-items: center;
-  gap: 120px;
+  gap: 10px;
 }
 
 .mid-details-dash span {
@@ -95,15 +104,24 @@
 }
 
 
+
 .price-course-api,
-.hide-students {
-  width: 80px;
+.hide-students,
+.hide-reviews,
+.hide-rating,
+.hide-lessons,
+.hide-duration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
 }
 
 
 .right-details-dash {
   display: flex;
   align-items: center;
+  margin-right: -28px;
   gap: 5px;
 }
 
@@ -193,8 +211,21 @@
   width: 100px;
 }
 
+@media(max-width: 1435px) {
+  .category-course {
+    display: none;
+  }
 
-@media(max-width: 1211px) {
+  .new-category,
+  .best-category,
+  .hot-category,
+  .none-category {
+    display: none !important;
+  }
+
+}
+
+@media(max-width: 1325px) {
   .students-course {
     display: none;
   }
@@ -204,15 +235,42 @@
   }
 }
 
-@media(max-width: 1040px) {
-  .category-course {
+@media(max-width: 1215px) {
+  .review-course {
     display: none;
   }
 
-  .new-category,
-  .best-category,
-  .hot-category,
-  .none-category {
+  .hide-reviews {
+    display: none !important;
+  }
+}
+
+@media(max-width: 1101px) {
+  .rate-course {
+    display: none;
+  }
+
+  .hide-rating {
+    display: none !important;
+  }
+}
+
+@media(max-width: 990px) {
+  .lessons-course {
+    display: none;
+  }
+
+  .hide-lessons {
+    display: none !important;
+  }
+}
+
+@media (max-width: 880px) {
+  .duration-course {
+    display: none;
+  }
+
+  .hide-duration {
     display: none !important;
   }
 }

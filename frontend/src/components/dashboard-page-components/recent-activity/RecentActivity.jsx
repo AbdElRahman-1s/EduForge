@@ -111,7 +111,7 @@ function RecentActivity() {
           <div className="recent-signups-grid">
             <div className='title-signups'>
               <h4>Recent Signups</h4>
-              <span>This week</span>
+              <span>Last 30 days</span>
             </div>
 
             {

@@ -64,7 +64,7 @@ function Dashboard() {
                         </>
                     }
                     {
-                        selected === 'users' &&
+                        selected === 'students' &&
                         <>
                             <UsersComponent />
                         </>
