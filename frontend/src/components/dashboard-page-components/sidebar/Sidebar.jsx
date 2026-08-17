@@ -59,11 +59,11 @@ function Sidebar({ switchSidebar, setSwitchSidebar , selected , setSelected}) {
             </div>
 
             <div
-              className={selected === 'users' ? 'selected' : "users-side"}
-              onClick={() => { setSelected('users') }}
+              className={selected === 'students' ? 'selected' : "users-side"}
+              onClick={() => { setSelected('students') }}
             >
               <LuUserCheck />
-              <span>Users</span>
+              <span>Students</span>
             </div>
 
 

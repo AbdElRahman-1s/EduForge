@@ -99,7 +99,7 @@ function UsersComponent() {
 
           <div className="users-users-head">
             <div className="left-header">
-              USER
+              STUDENTS
             </div>
 
             <div className="mid-head">
