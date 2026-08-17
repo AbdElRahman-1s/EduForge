@@ -121,7 +121,9 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
         )
         context["is_enrolled"] = (
             self.request.user.is_authenticated
-            and course.enrollments.filter(student=self.request.user).exists()
+            and course.enrollments.filter(
+                student=self.request.user, status="active"
+            ).exists()
         )
 
         return context

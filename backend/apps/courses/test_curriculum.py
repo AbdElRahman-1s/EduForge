@@ -821,6 +821,19 @@ class CourseDetailCurriculumTests(CurriculumAPITestCase):
         )
         self.assertIsNone(non_enrolled_lessons["Environment Setup"]["video"])
 
+    def test_suspended_enrollment_cannot_view_locked_videos(self):
+        from apps.enrollments.models import Enrollment
+
+        Enrollment.objects.create(
+            student=self.student, course=self.course, status="suspend"
+        )
+        self._auth_as(self.student)
+
+        lessons = self._lessons_by_title(self._get_detail())
+
+        self.assertEqual(lessons["Introduction"]["video"], self.free_lesson.video)
+        self.assertIsNone(lessons["Environment Setup"]["video"])
+
     def test_locked_video_url_is_absent_from_the_raw_response_body(self):
         """The locked URL must not leak anywhere in the payload, not just be nulled."""
         response = self.client.get(self.detail_url)
