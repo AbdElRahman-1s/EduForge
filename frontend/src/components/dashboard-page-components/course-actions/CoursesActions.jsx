@@ -305,7 +305,11 @@ function CoursesActions({setSelected}) {
             </div>
             <div className="mid-header">
               <span className="category-course">CATEGORY</span>
-              <span className="students-course">STUDENTS</span>
+              <span className="students-course">ENROLLMENTS</span>
+              <span className="review-course">REVIEWS </span>
+              <span className="rate-course">RATING </span>
+              <span className="lessons-course">LESSONS</span>
+              <span className="duration-course">DURATION</span>
               <span className="price-course">PRICE</span>
             </div>
             <div className="right-header">
@@ -320,13 +324,19 @@ function CoursesActions({setSelected}) {
                   <div className="left-details-dash">
                     <img src={mineCourseResult.thumbnail} alt="" />
                     <div className='title-inst-course'>
-                      <p className="title-course">{mineCourseResult.title}</p>
+                      <p 
+                      title={mineCourseResult.title}
+                      className="title-course">{mineCourseResult.title}</p>
                       <span className="inst-course">{mineCourseResult.instructor?.username}</span>
                     </div>
                   </div>
                   <div className='mid-details-dash'>
                     <span className={selectClassCategory(mineCourseResult.badge)}>{mineCourseResult.badge}</span>
                     <span className="hide-students">48,200</span>
+                    <span className="hide-reviews">1.2k</span>
+                    <span className="hide-rating">4.7</span>
+                    <span className="hide-lessons">36</span>
+                    <span className="hide-duration">12h45</span>
                     <span className="price-course-api">${mineCourseResult.price}</span>
                   </div>
                   <div className="right-details-dash">
