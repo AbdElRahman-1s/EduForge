@@ -7,10 +7,10 @@ user = get_user_model()
 
 # Create your models here.
 class Enrollment(models.Model):
-    STATUS = (
-        ("active", "Active"),
-        ("suspend", "Suspended"),
-    )
+    class Status(models.TextChoices):
+        ACTIVE = "active", "Active"
+        SUSPENDED = "suspended", "Suspended"
+
     student = models.ForeignKey(
         user, on_delete=models.CASCADE, related_name="enrollments"
     )
@@ -18,7 +18,9 @@ class Enrollment(models.Model):
         Course, on_delete=models.CASCADE, related_name="enrollments"
     )
     enrolled_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=STATUS, default="active")
+    status = models.CharField(
+        max_length=10, choices=Status.choices, default=Status.ACTIVE
+    )
 
     class Meta:
         unique_together = ("student", "course")
