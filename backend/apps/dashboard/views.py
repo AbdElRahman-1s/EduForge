@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from apps.courses.permissions import IsInstructor
 from apps.enrollments.models import Enrollment
 
-from .serializers import DashboardOverviewSerializer
+from .serializers import DashboardOverviewSerializer, InstructorCourseSerializer
 
 
 class DashboardOverviewView(APIView):
@@ -58,4 +58,22 @@ class DashboardOverviewView(APIView):
             "recent_signups": recent_signups,
         }
         serializer = DashboardOverviewSerializer(instance=data)
+        return Response(serializer.data)
+
+
+class InstructorCoursesView(APIView):
+    permission_classes = [IsAuthenticated, IsInstructor]
+
+    def get(self, request, *args, **kwargs):
+        courses = request.user.courses.annotate(
+            enrollment_count=Count(
+                "enrollments__student_id",
+                filter=Q(enrollments__status=Enrollment.Status.ACTIVE),
+                distinct=True,
+            ),
+            lesson_count=Count("sections__lessons", distinct=True),
+            total_duration=Sum("sections__lessons__duration_seconds", default=0),
+        ).order_by("-enrollment_count")
+
+        serializer = InstructorCourseSerializer(instance=courses, many=True)
         return Response(serializer.data)
