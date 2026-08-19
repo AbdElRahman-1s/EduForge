@@ -37,3 +37,26 @@ class DashboardOverviewSerializer(serializers.Serializer):
     total_students = serializers.IntegerField()
     recent_courses = DashboardCourseSerializer(many=True, read_only=True)
     recent_signups = DashboardSignupSerializer(many=True, read_only=True)
+
+
+class InstructorCourseSerializer(serializers.ModelSerializer):
+    enrollment_count = serializers.IntegerField(read_only=True)
+    review_count = serializers.IntegerField(read_only=True, default=0)
+    avg_rating = serializers.FloatField(read_only=True, default=0.0)
+    lesson_count = serializers.IntegerField(read_only=True)
+    total_duration = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "title",
+            "thumbnail",
+            "category",
+            "enrollment_count",
+            "review_count",
+            "avg_rating",
+            "lesson_count",
+            "total_duration",
+            "price",
+        ]
