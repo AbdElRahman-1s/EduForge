@@ -60,3 +60,10 @@ class InstructorCourseSerializer(serializers.ModelSerializer):
             "total_duration",
             "price",
         ]
+
+
+class InstructorStudentSerializer(serializers.Serializer):
+    username = serializers.CharField(read_only=True)
+    email = serializers.EmailField(read_only=True)
+    course_count = serializers.IntegerField(read_only=True)
+    joined_at = serializers.DateTimeField(format="%Y:%m:%d", read_only=True)
