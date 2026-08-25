@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, F, Min, Q, Sum
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,7 +9,11 @@ from rest_framework.views import APIView
 from apps.courses.permissions import IsInstructor
 from apps.enrollments.models import Enrollment
 
-from .serializers import DashboardOverviewSerializer, InstructorCourseSerializer
+from .serializers import (
+    DashboardOverviewSerializer,
+    InstructorCourseSerializer,
+    InstructorStudentSerializer,
+)
 
 
 class DashboardOverviewView(APIView):
@@ -76,4 +80,26 @@ class InstructorCoursesView(APIView):
         ).order_by("-enrollment_count")
 
         serializer = InstructorCourseSerializer(instance=courses, many=True)
+        return Response(serializer.data)
+
+
+class InstructorStudentsView(APIView):
+    permission_classes = [IsAuthenticated, IsInstructor]
+
+    def get(self, request, *args, **kwargs):
+        students = (
+            Enrollment.objects.filter(course__instructor=request.user)
+            .values(
+                "student_id",
+                username=F("student__username"),
+                email=F("student__email"),
+            )
+            .annotate(
+                course_count=Count("course", distinct=True),
+                joined_at=Min("enrolled_at"),
+            )
+            .order_by("-course_count", "student_id")
+        )
+
+        serializer = InstructorStudentSerializer(instance=students, many=True)
         return Response(serializer.data)
