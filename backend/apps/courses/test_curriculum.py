@@ -825,7 +825,7 @@ class CourseDetailCurriculumTests(CurriculumAPITestCase):
         from apps.enrollments.models import Enrollment
 
         Enrollment.objects.create(
-            student=self.student, course=self.course, status="suspend"
+            student=self.student, course=self.course, status="suspended"
         )
         self._auth_as(self.student)
 
