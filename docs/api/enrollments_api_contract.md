@@ -31,13 +31,13 @@ An enrollment is a link between a user and a course.
 | `student`     | FK user  | The authenticated user who enrolled   |
 | `course`      | FK course| The course enrolled into              |
 | `enrolled_at` | datetime | Set automatically on creation         |
+| `status`      | string   | `active` or `suspended`; defaults to `active` |
 
 `(student, course)` is unique — a user cannot enroll twice in the same course.
 
 Enrollments are ordered newest-first (`-enrolled_at`) at the model level.
 
-There is no `status` or `progress` field on the model yet. The
-`progress_percent` value exposed by `GET /api/enrollments/mine/` is a hardcoded
+`status` is either `active` or `suspended` and defaults to `active`. Only active enrollments unlock non-free lesson videos. Suspended enrollments remain stored but are not treated as enrolled for curriculum access. The `progress_percent` value exposed by `GET /api/enrollments/mine/` is a hardcoded
 placeholder — see section 2.
 
 ---
@@ -426,3 +426,4 @@ Intentionally **out of scope** for this contract:
 - Paid enrollment, checkout, and payment webhooks
 - Lesson progress and course completion
 - Unlocking locked lesson videos for enrolled students
+
