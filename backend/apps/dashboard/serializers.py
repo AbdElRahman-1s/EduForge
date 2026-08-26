@@ -20,12 +20,11 @@ class DashboardCourseSerializer(serializers.ModelSerializer):
 class DashboardSignupSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="student.username", read_only=True)
     email = serializers.EmailField(source="student.email", read_only=True)
-    enrollment_id = serializers.IntegerField(source="id", read_only=True)
 
     class Meta:
         model = Enrollment
         fields = [
-            "enrollment_id",
+            "id",
             "username",
             "email",
             "status",
