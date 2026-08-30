@@ -11,7 +11,7 @@ import { LiaFileVideo } from "react-icons/lia";
 import './courses-actions.css';
 import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext";
-
+import { secondsToTime } from "../../../utills/time";
 
 
 
@@ -27,9 +27,7 @@ function CoursesActions({setSelected}) {
 
   const [categorySelectEdit, setCategorySelectEdit] = useState("");
   const [levelSelectEdit, setLevelSelectEdit] = useState("");
-  const [mineCourseResults, setmineCourseResults] = useState({
-    results: [],
-  });
+  const [mineCourseResults, setmineCourseResults] = useState([]);
   const [fetchCategories, setFetchCategories] = useState([]);
   const [fetchTopics, setFetchTopics] = useState([]);
   const [thumbnail, setThumbnail] = useState(null);
@@ -52,7 +50,7 @@ function CoursesActions({setSelected}) {
     async function fetchInsmineCourseResults() {
 
       try {
-        const response = await axios.get('/api/courses/mine/',
+        const response = await axios.get('/api/instructor/courses/',
           {
             headers: {
               Authorization: `Bearer ${accessToken}`
@@ -318,11 +316,11 @@ function CoursesActions({setSelected}) {
           </div>
 
           {
-            mineCourseResults.results.map((mineCourseResult) => {
+            mineCourseResults.map((mineCourseResult) => {
               return (
                 <div key={mineCourseResult.id} className="course-details">
                   <div className="left-details-dash">
-                    <img src={mineCourseResult.thumbnail} alt="" />
+                    <img src={`http://127.0.0.1:8000/${mineCourseResult.thumbnail}`} alt="" />
                     <div className='title-inst-course'>
                       <p 
                       title={mineCourseResult.title}
@@ -332,11 +330,11 @@ function CoursesActions({setSelected}) {
                   </div>
                   <div className='mid-details-dash'>
                     <span className={selectClassCategory(mineCourseResult.badge)}>{mineCourseResult.badge}</span>
-                    <span className="hide-students">48,200</span>
-                    <span className="hide-reviews">1.2k</span>
-                    <span className="hide-rating">4.7</span>
-                    <span className="hide-lessons">36</span>
-                    <span className="hide-duration">12h45</span>
+                    <span className="hide-students">{mineCourseResult.enrollment_count}</span>
+                    <span className="hide-reviews">{mineCourseResult.review_count}</span>
+                    <span className="hide-rating">{mineCourseResult.avg_rating}</span>
+                    <span className="hide-lessons">{mineCourseResult.lesson_count}</span>
+                    <span className="hide-duration">{secondsToTime(mineCourseResult.total_duration)}</span>
                     <span className="price-course-api">${mineCourseResult.price}</span>
                   </div>
                   <div className="right-details-dash">
