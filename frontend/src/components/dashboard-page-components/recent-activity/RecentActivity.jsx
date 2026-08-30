@@ -1,67 +1,52 @@
 
-const recentCourses = [
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    price: '$89',
-    students: '48.2k students'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    price: '$89',
-    students: '48.2k students'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    price: '$89',
-    students: '48.2k students'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=340&fit=crop&auto=format',
-    title: 'Complete React & Next.js Development',
-    instructor: 'Marcus Reid',
-    price: '$89',
-    students: '48.2k students'
-  }
-]
+import { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import { AuthContext } from "../../../context/AuthContext";
 
-const resentSignups = [
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    status: 'active'
-  },
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    status: 'active'
-  },
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    status: 'active'
-  },
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    status: 'suspended'
-  },
-]
+
 
 
 
 import './recent-activity.css';
 
 function RecentActivity() {
+
+  const {accessToken} = useContext(AuthContext);
+
+  const [recentCourses,setRecentCourses] = useState([]);
+  const [recentSignups,setRecentSignups] = useState([]);
+
+
+
+
+
+useEffect(() => {
+
+async function fetchDashboard(){
+ try{
+   const response = await axios.get('/api/instructor/dashboard/',
+    {
+      headers:{
+        Authorization: `Bearer ${accessToken}`,
+      }
+    }
+  )
+
+  console.log(response.data);
+  setRecentCourses(response.data.recent_courses);
+  setRecentSignups(response.data.recent_signups);
+ }catch(error){
+  console.log(error.response?.data);
+ }
+  
+}
+fetchDashboard();
+
+},[accessToken]);
+
+
+
+
   return (
     <section>
 
@@ -75,27 +60,26 @@ function RecentActivity() {
               <h4>Recent Courses</h4>
               <span>Last 30 days</span>
             </div>
-            {recentCourses.map((recentCourse, i) => {
+            {recentCourses.map((recentCourse) => {
               return (
-                <div key={i} className='course-div'>
+                <div key={recentCourse.id} className='course-div'>
                   <div className='img-title-inst'>
                     <div className='img-div'>
                       <img className='img-course'
-                        src={recentCourse.img}
+                        src={`http://127.0.0.1:8000${recentCourse.thumbnail}`}
                         alt="course image"
                       />
                     </div>
                     <div className='title-inst'>
                       <p>{recentCourse.title}</p>
-                      <span>{recentCourse.instructor}</span>
                     </div>
                   </div>
 
                   <div className='price-students-div'>
 
-                    <span className='price-course'>{recentCourse.price}</span>
+                    <span className='price-course'>{recentCourse.student_count}</span>
 
-                    <span className='students-course'>{recentCourse.students}</span>
+                    <span className='students-course'>Students</span>
 
                   </div>
 
@@ -115,16 +99,16 @@ function RecentActivity() {
             </div>
 
             {
-              resentSignups.map((recentSignup,i) => {
+              recentSignups.map((recentSignup) => {
                 return (
-                  <div key={i} className="signups-div">
+                  <div key={recentSignup.enrollment_id} className="signups-div">
                     <div className='left-signup'>
                       <div className='f-letter-div'>
-                        {recentSignup.fLetter}
+                         {recentSignup.username?.[0]?.toUpperCase()}
                       </div>
                       <div className='name-email-div'>
                         <span className='name-signup'>
-                          {recentSignup.name}
+                          {recentSignup.username}
                         </span>
                         <span className='email-signup'>
                           {recentSignup.email}

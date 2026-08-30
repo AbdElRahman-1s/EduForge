@@ -329,7 +329,7 @@ function CoursesActions({setSelected}) {
                     </div>
                   </div>
                   <div className='mid-details-dash'>
-                    <span className={selectClassCategory(mineCourseResult.badge)}>{mineCourseResult.badge}</span>
+                    <span className={selectClassCategory(mineCourseResult.category)}>{mineCourseResult.category}</span>
                     <span className="hide-students">{mineCourseResult.enrollment_count}</span>
                     <span className="hide-reviews">{mineCourseResult.review_count}</span>
                     <span className="hide-rating">{mineCourseResult.avg_rating}</span>

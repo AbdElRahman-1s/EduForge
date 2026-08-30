@@ -56,16 +56,18 @@
   border-bottom: 1px solid rgb(246, 246, 246);
 }
 
+.course-div:last-child,
+.signups-div:last-child{
+  border: none;
+  margin-bottom: -15px;
+}
+
 .img-title-inst {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.title-inst span {
-  color: oklch(0.705 0.015 286.067);
-  font-size: 14px;
-}
 
 .title-inst p {
   font-size: 18px;
