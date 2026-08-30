@@ -126,6 +126,10 @@
   font-size: 15px;
 }
 
+.joined-users,
+.course-users{
+  margin-right: 15px;
+}
 
 .users-mid-details {
   display: flex;
@@ -141,23 +145,13 @@
 .users-courses-users {
   color: oklch(0.552 0.016 285.938);
   font-size: 13px;
+  margin-left: 30px;
 }
 
-.status-users-active {
-  background-color: oklch(0.979 0.021 166.113);
-  color: oklch(0.508 0.118 165.612);
-  padding: 3px 10px;
-  border-radius: 15px;
-  width: 100px;
+.users-courses-users{
+  margin-left: 30px;
 }
 
-.status-users-suspended {
-  background-color: oklch(0.971 0.013 17.38);
-  color: oklch(0.577 0.245 27.325);
-  padding: 3px 10px;
-  border-radius: 15px;
-  width: 100px;
-}
 
 .users-right-details {
   display: flex;
@@ -247,17 +241,7 @@
   }
 
 
-  .status-users {
-    display: none;
-  }
-
-  .status-users-active {
-    display: none !important;
-  }
-
-  .status-users-suspended {
-    display: none !important;
-  }
+ 
 
   .users-mid-details {
     margin-right: 50px;

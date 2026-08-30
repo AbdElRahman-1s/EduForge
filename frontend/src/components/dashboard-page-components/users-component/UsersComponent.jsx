@@ -1,87 +1,51 @@
+import { useContext, useEffect, useState } from "react";
 
 
-
-import { FaRegTimesCircle, FaRegCheckCircle } from "react-icons/fa";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
 
 
 
 import './users-component.css';
-import { useState } from "react";
+import { AuthContext } from "../../../context/AuthContext";
+import axios from "axios";
 
-
-
-
-const usersDetails = [
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    joined: 'Jan 12, 2025',
-    courses: '3',
-    status: 'active',
-     id: crypto.randomUUID()
-  },
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    joined: 'Jan 12, 2025',
-    courses: '3',
-    status: 'active',
-    id: crypto.randomUUID()
-  },
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    joined: 'Jan 12, 2025',
-    courses: '3',
-    status: 'active',
-     id: crypto.randomUUID()
-  },
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    joined: 'Jan 12, 2025',
-    courses: '3',
-    status: 'suspended',
-     id: crypto.randomUUID()
-  },
-  {
-    fLetter: 'A',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    joined: 'Jan 12, 2025',
-    courses: '3',
-    status: 'active',
-     id: crypto.randomUUID()
-  },
-
-]
 
 
 
 function UsersComponent() {
 
-  const [users,setUsers] = useState(usersDetails);
+  const {accessToken} = useContext(AuthContext);
 
 
+  const [users,setUsers] = useState([]);
 
-  function toggleStatus(id) {
-  setUsers(
-    users.map((user) =>
-      user.id === id
-        ? {
-            ...user,
-            status: user.status === "active" ? "suspended" : "active",
+  useEffect(() => {
+    async function fetchStudents(){
+      try{
+
+        const response = await axios.get('/api/instructor/students/',
+          {
+            headers:{
+              Authorization: `Bearer ${accessToken}`
+            }
           }
-        : user
-    )
-  );
-}
+        )
+
+        console.log(response.data);
+        setUsers(response.data);
+
+
+      }catch(error){
+        console.log(error.response?.data);
+      }
+    }
+
+    fetchStudents();
+
+  },[accessToken])
+
+
 
 
   return (
@@ -105,7 +69,6 @@ function UsersComponent() {
             <div className="mid-head">
               <span className="joined-users">JOINED</span>
               <span className="course-users">COURSES</span>
-              <span className="status-users">STATUS</span>
             </div>
 
             <div className="right-head">
@@ -119,36 +82,27 @@ function UsersComponent() {
           {
             users.map((userDetails) => {
               return (
-                <div key={userDetails.id} className="users-user-details">
+                <div key={userDetails.username} className="users-user-details">
                   <div className="users-left-details">
                     <div className="users-letter-div">
-                      {userDetails.fLetter}
+                      {userDetails.username?.[0]?.toUpperCase()}
                     </div>
                     <div className="users-user-name-email">
-                      <span className="users-name-users">{userDetails.name}</span>
+                      <span className="users-name-users">{userDetails.username}</span>
                       <span className="users-email-users">{userDetails.email}</span>
                     </div>
 
                   </div>
 
                   <div className="users-mid-details">
-                    <span className="users-joined-users">{userDetails.joined}</span>
-                    <span className="users-courses-users">{userDetails.courses}</span>
-                    <span
-                      className={userDetails.status === 'active' ? 'status-users-active' : 'status-users-suspended'}>
-                      {userDetails.status}</span>
+                    <span className="users-joined-users">{userDetails.joined_at}</span>
+                    <span className="users-courses-users">{userDetails.course_count}</span>
                   </div>
 
 
                   <div className="users-right-details">
-                    <span className="users-eye-span">
+                    <span title="Student Profile" className="users-eye-span">
                       <MdOutlineRemoveRedEye />
-                    </span>
-                    <span  
-                    className={userDetails.status === 'active'? "x-span" : "y-span"}
-                    onClick={() => {toggleStatus(userDetails.id)}}
-                    >
-                      {userDetails.status === 'active' ? <FaRegTimesCircle /> : <FaRegCheckCircle />}
                     </span>
                   </div>
 
