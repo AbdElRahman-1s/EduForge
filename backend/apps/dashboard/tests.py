@@ -173,7 +173,7 @@ class InstructorCoursesTests(APITestCase):
         token = RefreshToken.for_user(instructor).access_token
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
 
-        response = self.client.get(reverse("instructor-courses"))
+        response = self.client.get(reverse("instructor-course-analytics"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["lesson_count"], 2)
