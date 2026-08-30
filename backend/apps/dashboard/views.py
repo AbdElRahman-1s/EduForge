@@ -69,7 +69,7 @@ class InstructorCoursesView(APIView):
     permission_classes = [IsAuthenticated, IsInstructor]
 
     def get(self, request, *args, **kwargs):
-        courses = request.user.courses.annotate(
+        courses = request.user.courses.select_related("category").annotate(
             enrollment_count=Count(
                 "enrollments__student_id",
                 filter=Q(enrollments__status=Enrollment.Status.ACTIVE),

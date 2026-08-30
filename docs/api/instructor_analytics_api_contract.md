@@ -17,9 +17,17 @@ status.
 ## Course analytics
 
 `GET /api/instructor/courses/` returns only owned courses with `id`, `title`,
-`thumbnail`, `category`, active `enrollment_count`, `review_count`,
-`avg_rating`, `lesson_count`, `total_duration` (seconds), and `price`.
-Review fields currently default to `0`/`0.0` because no review model exists.
+`thumbnail`, `category` (the category **name**, not its id), active
+`enrollment_count`, `review_count`, `avg_rating`, `lesson_count`,
+`total_duration` (seconds), and `price`. Review fields currently default to
+`0`/`0.0` because no review model exists.
+
+```json
+[{"id": 1, "title": "Intro to Django", "thumbnail": "/media/courses/intro.jpg",
+  "category": "Web Development", "enrollment_count": 12, "review_count": 0,
+  "avg_rating": 0.0, "lesson_count": 8, "total_duration": 3600,
+  "price": "0.00"}]
+```
 
 ## Student summary
 
