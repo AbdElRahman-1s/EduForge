@@ -19,6 +19,7 @@ import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import CurriculumAccordion from "../../components/Course-Curriculum-component/CurriculumAccordion";
 import { AuthContext } from "../../context/AuthContext";
+import ReviewsSection from "../../components/course-details-components/ReviewsSection";
 
 
 
@@ -264,6 +265,8 @@ function CourseDetails() {
               }
 
             </div>
+
+            <ReviewsSection />
 
 
           </div>
