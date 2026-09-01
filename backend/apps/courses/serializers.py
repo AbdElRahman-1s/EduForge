@@ -109,6 +109,8 @@ class CourseListSerializer(serializers.ModelSerializer):
     topics = serializers.SlugRelatedField(slug_field="name", read_only=True, many=True)
     instructor = InstructorSerializer(read_only=True)
     is_enrolled = serializers.SerializerMethodField()
+    review_count = serializers.IntegerField(read_only=True)
+    avg_rating = serializers.FloatField(read_only=True, allow_null=True)
 
     class Meta:
         model = Course
@@ -124,6 +126,8 @@ class CourseListSerializer(serializers.ModelSerializer):
             "instructor",
             "published",
             "is_enrolled",
+            "review_count",
+            "avg_rating",
             "created_at",
         ]
 

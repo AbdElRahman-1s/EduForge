@@ -209,6 +209,8 @@ None required.
       },
       "published": true,
       "is_enrolled": false,
+      "review_count": 4,
+      "avg_rating": 4.5,
       "created_at": "2026-07-01T10:00:00Z"
     }
   ]
@@ -216,6 +218,8 @@ None required.
 ```
 
 `thumbnail` is an absolute URL, or `null` when no image has been uploaded.
+`review_count` is the number of reviews on the course; `avg_rating` is the mean
+rating (1–5), or `null` when the course has no reviews.
 
 ---
 
@@ -266,6 +270,8 @@ Optional. Authenticated instructors can access their own unpublished courses.
   },
   "published": true,
   "is_enrolled": false,
+  "review_count": 4,
+  "avg_rating": 4.5,
   "created_at": "2026-07-01T10:00:00Z",
   "description": "Learn to build production APIs with Django REST Framework.",
   "total_lessons": 2,
@@ -299,7 +305,9 @@ Optional. Authenticated instructors can access their own unpublished courses.
 ```
 
 `total_lessons` and `total_duration_seconds` are aggregated across all sections
-and default to `0` for an empty curriculum.
+and default to `0` for an empty curriculum. `review_count` and `avg_rating`
+behave as in the list response (`avg_rating` is `null` when there are no
+reviews).
 
 ## Error Cases
 
@@ -545,6 +553,8 @@ response and the payload has no `next` or `previous` keys.
       },
       "published": false,
       "is_enrolled": false,
+      "review_count": 0,
+      "avg_rating": null,
       "created_at": "2026-07-16T09:15:00Z"
     }
   ]
