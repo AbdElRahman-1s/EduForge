@@ -9,6 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.accounts.models import User
 from apps.courses.models import Category, Course, Lesson, Section
 from apps.enrollments.models import Enrollment
+from apps.reviews.models import Review
 
 
 class DashboardOverviewTests(APITestCase):
@@ -178,6 +179,113 @@ class InstructorCoursesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["lesson_count"], 2)
         self.assertEqual(response.data[0]["total_duration"], 420)
+
+    def test_review_count_and_avg_rating_are_aggregated(self):
+        instructor = User.objects.create_user(
+            username="ratings-owner",
+            email="ratings-owner@example.com",
+            role=User.Role.INSTRUCTOR,
+        )
+        category = Category.objects.create(name="Ratings")
+        course = Course.objects.create(
+            instructor=instructor,
+            category=category,
+            title="Rated course",
+            description="Description",
+            level=Course.CourseLevel.BEGINNER,
+            price="0.00",
+        )
+        student_one = User.objects.create_user(
+            username="rater-one", email="rater-one@example.com"
+        )
+        student_two = User.objects.create_user(
+            username="rater-two", email="rater-two@example.com"
+        )
+        Review.objects.create(student=student_one, course=course, rating=4)
+        Review.objects.create(student=student_two, course=course, rating=5)
+        token = RefreshToken.for_user(instructor).access_token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        response = self.client.get(reverse("instructor-course-analytics"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["review_count"], 2)
+        self.assertEqual(response.data[0]["avg_rating"], 4.5)
+
+    def test_course_without_reviews_has_zero_count_and_null_avg(self):
+        instructor = User.objects.create_user(
+            username="empty-ratings-owner",
+            email="empty-ratings-owner@example.com",
+            role=User.Role.INSTRUCTOR,
+        )
+        category = Category.objects.create(name="Ratings")
+        Course.objects.create(
+            instructor=instructor,
+            category=category,
+            title="Unrated course",
+            description="Description",
+            level=Course.CourseLevel.BEGINNER,
+            price="0.00",
+        )
+        token = RefreshToken.for_user(instructor).access_token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        response = self.client.get(reverse("instructor-course-analytics"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["review_count"], 0)
+        self.assertIsNone(response.data[0]["avg_rating"])
+
+    def test_review_stats_do_not_distort_duration_with_enrollments(self):
+        instructor = User.objects.create_user(
+            username="metrics-owner",
+            email="metrics-owner@example.com",
+            role=User.Role.INSTRUCTOR,
+        )
+        category = Category.objects.create(name="Metrics")
+        course = Course.objects.create(
+            instructor=instructor,
+            category=category,
+            title="Metrics course",
+            description="Description",
+            level=Course.CourseLevel.BEGINNER,
+            price="0.00",
+        )
+        section = Section.objects.create(course=course, title="Section", order=1)
+        Lesson.objects.create(
+            section=section,
+            title="First lesson",
+            duration_seconds=120,
+            video="https://example.com/first",
+            order=1,
+        )
+        Lesson.objects.create(
+            section=section,
+            title="Second lesson",
+            duration_seconds=300,
+            video="https://example.com/second",
+            order=2,
+        )
+        student = User.objects.create_user(
+            username="enrolled-rater", email="enrolled-rater@example.com"
+        )
+        Enrollment.objects.create(student=student, course=course)
+        other_student = User.objects.create_user(
+            username="other-rater", email="other-rater@example.com"
+        )
+        Review.objects.create(student=student, course=course, rating=4)
+        Review.objects.create(student=other_student, course=course, rating=5)
+        token = RefreshToken.for_user(instructor).access_token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        response = self.client.get(reverse("instructor-course-analytics"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["enrollment_count"], 1)
+        self.assertEqual(response.data[0]["lesson_count"], 2)
+        self.assertEqual(response.data[0]["total_duration"], 420)
+        self.assertEqual(response.data[0]["review_count"], 2)
+        self.assertEqual(response.data[0]["avg_rating"], 4.5)
 
 
 class InstructorStudentsTests(APITestCase):

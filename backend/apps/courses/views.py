@@ -20,6 +20,7 @@ from .serializers import (
 from .services import reorder_sections, reorder_lessons
 from .models import Course, Category, Topic, Section, Lesson
 from .permissions import IsInstructor, IsCourseOwner
+from apps.reviews.annotations import annotate_review_stats
 from django.contrib.auth import get_user_model
 
 # Create your views here.
@@ -34,7 +35,9 @@ class CourseListCreateView(generics.ListCreateAPIView):
         ).prefetch_related("topics")
 
         if self.request.method == "GET":
-            return queryset.filter(published=True)
+            return annotate_review_stats(
+                queryset.filter(published=True)
+            )
         return queryset
 
     def get_serializer_class(self):
@@ -73,7 +76,7 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
         ):
             filters |= Q(instructor=self.request.user)
 
-        return (
+        queryset = (
             Course.objects.filter(filters)
             .select_related("instructor", "category")
             .prefetch_related(
@@ -92,6 +95,7 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
                 ),
             )
         )
+        return annotate_review_stats(queryset)
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -135,7 +139,9 @@ class InstructorCourseListView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        return Course.objects.filter(instructor=self.request.user)
+        return annotate_review_stats(
+            Course.objects.filter(instructor=self.request.user)
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

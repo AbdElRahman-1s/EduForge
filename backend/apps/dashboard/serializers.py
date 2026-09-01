@@ -41,8 +41,8 @@ class DashboardOverviewSerializer(serializers.Serializer):
 class InstructorCourseSerializer(serializers.ModelSerializer):
     category = serializers.ReadOnlyField(source="category.name")
     enrollment_count = serializers.IntegerField(read_only=True)
-    review_count = serializers.IntegerField(read_only=True, default=0)
-    avg_rating = serializers.FloatField(read_only=True, default=0.0)
+    review_count = serializers.IntegerField(read_only=True)
+    avg_rating = serializers.FloatField(read_only=True, allow_null=True)
     lesson_count = serializers.IntegerField(read_only=True)
     total_duration = serializers.IntegerField(read_only=True)
 

@@ -543,8 +543,6 @@ student cascades to their reviews as well.
 
 Intentionally **out of scope** for this contract:
 
-- Aggregated `avg_rating` / `review_count` on course list, course detail, and
-  instructor analytics endpoints (next issue in this milestone)
 - Edit timestamps surfaced to clients
 - Review moderation (flagging, hiding)
 - Sorting by rating or by "most helpful"
