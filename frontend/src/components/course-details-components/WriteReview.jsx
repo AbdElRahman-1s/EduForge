@@ -1,26 +1,57 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
+import { AuthContext } from '../../context/AuthContext';
 
 import './write-review.css';
 
 function WriteReview() {
-
+  const { id } = useParams();
+  const { accessToken } = useContext(AuthContext);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmitReview = async () => {
     if (rating === 0) {
-      alert('Please select a rating');
+      setErrorMessage('Please select a rating');
       return;
     }
 
     if (!comment.trim()) {
-      alert('Please write a review');
+      setErrorMessage('Please write a review');
       return;
     }
 
-    console.log(rating, comment);
+    try {
+      const response = await axios.post(
+        `/api/courses/${id}/reviews/`,
+        {
+          rating,
+          comment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
+
+      console.log(response.data);
+    } catch (error) {
+      const data = error.response?.data;
+
+      if (data?.detail) {
+        setErrorMessage(data.detail);
+      } else if (data?.rating) {
+        setErrorMessage(data.rating[0]);
+      } else {
+        setErrorMessage("Something went wrong. Please try again.");
+      }
+    }
   };
+
 
   return (
     <div className="write-review">
@@ -42,10 +73,10 @@ function WriteReview() {
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
-
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
       <button
         className='click-submit'
-        onClick={handleSubmit}
+        onClick={handleSubmitReview}
       >
         Submit Review
       </button>

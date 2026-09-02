@@ -58,3 +58,12 @@
 .write-review .click-submit:hover {
   background-color: #444;
 }
+
+.error-message{
+  font-size: 14px;
+  color: red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
