@@ -6,7 +6,7 @@ import { AuthContext } from '../../context/AuthContext';
 
 import './write-review.css';
 
-function WriteReview() {
+function WriteReview({setReviews }) {
   const { id } = useParams();
   const { accessToken } = useContext(AuthContext);
   const [rating, setRating] = useState(0);
@@ -39,6 +39,7 @@ function WriteReview() {
       );
 
       console.log(response.data);
+      setReviews((prev) => [response.data, ...prev]);
     } catch (error) {
       const data = error.response?.data;
 

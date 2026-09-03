@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.courses",
     "apps.enrollments",
+    "apps.reviews",
     "apps.dashboard",
     # Packages
     "rest_framework",
