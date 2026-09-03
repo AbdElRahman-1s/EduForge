@@ -14,6 +14,7 @@ class ReviewerSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     student = ReviewerSerializer(read_only=True)
     rating = serializers.IntegerField(min_value=1, max_value=5)
+    created_at = serializers.DateTimeField(format="%Y-%m-%d", read_only=True)
 
     class Meta:
         model = Review
