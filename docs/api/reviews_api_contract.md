@@ -37,7 +37,7 @@ A review is a rating + optional comment left by a student on a course.
 | `course`      | FK course| The course being reviewed                      |
 | `rating`      | integer  | 1–5; DB check constraint                       |
 | `comment`     | text     | Optional; defaults to `""`                     |
-| `created_at`  | datetime | Set automatically on creation                  |
+| `created_at`  | date     | Set automatically on creation; serialized date-only as `YYYY-MM-DD` (UTC) |
 | `updated_at`  | datetime | Set automatically on update; **not exposed** in responses |
 
 `(student, course)` is unique — enforced by a `UniqueConstraint`. Duplicate
@@ -48,6 +48,12 @@ deterministic tie-breaker. The list endpoint returns pages of **5** reviews.
 
 > `updated_at` exists on the model but is not in any response payload. Clients
 > cannot currently tell when a review was last edited.
+
+> `created_at` is rendered **date-only** (`YYYY-MM-DD`, in the server's UTC
+> timezone) — the time component is truncated for display. List ordering
+> (`-created_at`) still reflects recency; a client that needs relative times
+> ("2 days ago") or local-timezone dates cannot reconstruct the timestamp from
+> this field alone.
 
 ---
 
@@ -112,7 +118,7 @@ None — public.
       },
       "rating": 5,
       "comment": "Loved the Django module.",
-      "created_at": "2026-09-01T12:30:19.998161Z"
+      "created_at": "2026-09-01"
     },
     {
       "id": 9,
@@ -122,7 +128,7 @@ None — public.
       },
       "rating": 3,
       "comment": "",
-      "created_at": "2026-08-30T09:15:02.101130Z"
+      "created_at": "2026-08-30"
     }
   ]
 }
@@ -156,7 +162,7 @@ Empty course:
 | `student`   | Nested `{id, username}` of the reviewer        |
 | `rating`    | Integer 1–5                                    |
 | `comment`   | Free text; `""` when the reviewer left none    |
-| `created_at`| When the review was created                    |
+| `created_at`| Date the review was created — `YYYY-MM-DD` (UTC); time truncated for display |
 
 ## Pagination
 
@@ -254,7 +260,7 @@ Checks run in this order, and the first failure is returned:
   },
   "rating": 4,
   "comment": "Great pacing, but the last section felt rushed.",
-  "created_at": "2026-09-01T12:30:19.998161Z"
+  "created_at": "2026-09-01"
 }
 ```
 
@@ -413,7 +419,7 @@ single-review endpoint — public consumers should use the course reviews list
   },
   "rating": 4,
   "comment": "Great pacing, but the last section felt rushed.",
-  "created_at": "2026-09-01T12:30:19.998161Z"
+  "created_at": "2026-09-01"
 }
 ```
 
@@ -484,7 +490,7 @@ Partial updates are supported. Send any of:
   },
   "rating": 5,
   "comment": "Changed my mind — actually excellent.",
-  "created_at": "2026-09-01T12:30:19.998161Z"
+  "created_at": "2026-09-01"
 }
 ```
 
