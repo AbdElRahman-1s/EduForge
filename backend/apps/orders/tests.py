@@ -1,15 +1,36 @@
+import threading
+import time
 from decimal import Decimal
 from unittest.mock import Mock, patch
 
+from django.db import close_old_connections
+from django.db.utils import OperationalError
+from django.test import TransactionTestCase
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
 from apps.courses.models import Category, Course
 from apps.enrollments.models import Enrollment
 from apps.orders.models import Order
+
+
+def _completed_event(session_id, amount_total):
+    return {
+        "type": "checkout.session.completed",
+        "data": {
+            "object": {"id": session_id, "amount_total": amount_total}
+        },
+    }
+
+
+def _payment_failed_event(session_id):
+    return {
+        "type": "checkout.session.payment_failed",
+        "data": {"object": {"id": session_id}},
+    }
 
 
 class CheckoutAPITests(APITestCase):
@@ -210,3 +231,189 @@ class CheckoutAPITests(APITestCase):
         self.assertEqual(orders[1].provider_reference, "cs_test_second")
         self.assertEqual(second.data["order_id"], orders[1].pk)
         self.assertNotEqual(orders[0].pk, orders[1].pk)
+
+
+class StripeWebhookTests(APITestCase):
+    def setUp(self):
+        self.instructor = User.objects.create_user(
+            username="webhook-instructor",
+            email="wh-instructor@example.com",
+            role=User.Role.INSTRUCTOR,
+        )
+        self.category = Category.objects.create(name="Webhook")
+        self.student = User.objects.create_user(
+            username="wh-student", email="wh-student@example.com"
+        )
+        self.course = Course.objects.create(
+            instructor=self.instructor,
+            category=self.category,
+            title="Webhook course",
+            description="Description",
+            level=Course.CourseLevel.BEGINNER,
+            price="89.00",
+            published=True,
+        )
+
+    def _order(self, *, status=Order.Status.PENDING, ref="cs_webhook_1"):
+        return Order.objects.create(
+            student=self.student,
+            course=self.course,
+            amount="89.00",
+            status=status,
+            provider_reference=ref,
+        )
+
+    def _deliver(self, event):
+        with patch(
+            "apps.orders.gateways.stripe.Webhook.construct_event",
+            return_value=event,
+        ):
+            return self.client.post(
+                reverse("stripe-webhook"),
+                data=b"{}",
+                content_type="application/json",
+                HTTP_STRIPE_SIGNATURE="test_sig",
+            )
+
+    def test_valid_event_marks_order_paid_and_enrolls(self):
+        order = self._order(ref="cs_paid")
+
+        response = self._deliver(_completed_event("cs_paid", 8900))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.PAID)
+        enrollment = Enrollment.objects.get()
+        self.assertEqual(enrollment.student, self.student)
+        self.assertEqual(enrollment.course, self.course)
+        self.assertEqual(enrollment.status, Enrollment.Status.ACTIVE)
+
+    def test_replayed_event_on_paid_order_does_not_re_enroll(self):
+        order = self._order(status=Order.Status.PAID, ref="cs_paid")
+        Enrollment.objects.create(student=self.student, course=self.course)
+
+        response = self._deliver(_completed_event("cs_paid", 8900))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.PAID)
+        self.assertEqual(Enrollment.objects.count(), 1)
+
+    def test_amount_mismatch_marks_order_failed_without_enrolling(self):
+        order = self._order(ref="cs_wrong_amount")
+
+        response = self._deliver(_completed_event("cs_wrong_amount", 9900))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.FAILED)
+        self.assertEqual(Enrollment.objects.count(), 0)
+
+    def test_payment_failed_marks_order_failed(self):
+        order = self._order(ref="cs_failed")
+
+        response = self._deliver(_payment_failed_event("cs_failed"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.FAILED)
+        self.assertEqual(Enrollment.objects.count(), 0)
+
+    def test_tampered_signature_returns_400(self):
+        self._order(ref="cs_ignored")
+
+        with patch(
+            "apps.orders.gateways.stripe.Webhook.construct_event",
+            side_effect=ValueError("bad signature"),
+        ):
+            response = self.client.post(
+                reverse("stripe-webhook"),
+                data=b"{}",
+                content_type="application/json",
+                HTTP_STRIPE_SIGNATURE="forged",
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Enrollment.objects.count(), 0)
+
+
+class StripeWebhookConcurrencyTests(TransactionTestCase):
+    """Two threads delivering the same event → one enrollment, one transition."""
+
+    def test_duplicate_delivery_activates_exactly_once(self):
+        instructor = User.objects.create_user(
+            username="conc-instructor",
+            email="conc-instructor@example.com",
+            role=User.Role.INSTRUCTOR,
+        )
+        category = Category.objects.create(name="Concurrency")
+        student = User.objects.create_user(
+            username="conc-student", email="conc-student@example.com"
+        )
+        course = Course.objects.create(
+            instructor=instructor,
+            category=category,
+            title="Concurrency course",
+            description="Description",
+            level=Course.CourseLevel.BEGINNER,
+            price="89.00",
+            published=True,
+        )
+        Order.objects.create(
+            student=student,
+            course=course,
+            amount="89.00",
+            provider_reference="cs_dup",
+        )
+        event = _completed_event("cs_dup", 8900)
+
+        barrier = threading.Barrier(2)
+        statuses = []
+
+        def deliver():
+            # SQLite shared-cache hands a losing writer an immediate
+            # `OperationalError: database table is locked` rather than waiting.
+            # Retry like Stripe redelivers a non-2xx webhook: once the winner
+            # commits, the retry sees the paid order and returns 200.
+            close_old_connections()
+            try:
+                client = APIClient()
+                barrier.wait(timeout=5)
+                for _ in range(10):
+                    try:
+                        response = client.post(
+                            reverse("stripe-webhook"),
+                            data=b"{}",
+                            content_type="application/json",
+                            HTTP_STRIPE_SIGNATURE="test_sig",
+                        )
+                    except OperationalError:
+                        time.sleep(0.01)
+                        close_old_connections()
+                        continue
+                    statuses.append(response.status_code)
+                    return
+            finally:
+                close_old_connections()
+
+        # A single shared patch (not one per thread): concurrent patch()
+        # contexts on the same target are unsafe and can restore the real
+        # function under a still-running thread.
+        with patch(
+            "apps.orders.gateways.stripe.Webhook.construct_event",
+            return_value=event,
+        ):
+            threads = [
+                threading.Thread(target=deliver) for _ in range(2)
+            ]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(timeout=10)
+
+        self.assertEqual(sorted(statuses), [200, 200])
+        order = Order.objects.get(provider_reference="cs_dup")
+        self.assertEqual(order.status, Order.Status.PAID)
+        self.assertEqual(
+            Enrollment.objects.filter(student=student, course=course).count(), 1
+        )

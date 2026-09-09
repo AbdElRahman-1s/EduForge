@@ -4,5 +4,7 @@ django-restframework==0.0.1
 djangorestframework==3.17.1
 djangorestframework_simplejwt==5.5.1
 PyJWT==2.13.0
+python-dotenv==1.2.3
 sqlparse==0.5.5
+stripe==15.6.1
 tzdata==2026.2
