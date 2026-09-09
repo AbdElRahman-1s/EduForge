@@ -34,3 +34,14 @@ def create_checkout_session(*, order, course, student, success_url, cancel_url):
         },
     )
     return session.id, session.url
+
+
+def construct_event(*, payload, sig_header):
+    """Verify a webhook signature and return the parsed event (raises ValueError)."""
+    try:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        return stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except (ValueError, stripe.error.StripeError) as exc:
+        raise ValueError("Could not verify Stripe signature.") from exc
