@@ -43,9 +43,9 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.courses",
     "apps.enrollments",
-    "apps.reviews",
     "apps.dashboard",
     "apps.reviews",
+    "apps.orders",
     # Packages
     "rest_framework",
     "rest_framework_simplejwt",
@@ -167,3 +167,16 @@ CORS_ALLOWED_ORIGINS = [
 
 
 CORS_ALLOW_CREDENTIALS = True
+
+
+# Stripe
+# Read from the environment with safe development defaults. {course_id} in the
+# success/cancel URLs is substituted at checkout time.
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_SUCCESS_URL = os.environ.get(
+    "STRIPE_SUCCESS_URL", "http://localhost:5173/courses/{course_id}"
+)
+STRIPE_CANCEL_URL = os.environ.get(
+    "STRIPE_CANCEL_URL", "http://localhost:5173/courses/{course_id}"
+)
