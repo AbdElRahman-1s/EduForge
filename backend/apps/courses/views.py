@@ -21,6 +21,7 @@ from .services import reorder_sections, reorder_lessons
 from .models import Course, Category, Topic, Section, Lesson
 from .permissions import IsInstructor, IsCourseOwner
 from apps.reviews.annotations import annotate_review_stats
+from apps.enrollments.services import active_course_ids, is_enrolled
 from django.contrib.auth import get_user_model
 
 # Create your views here.
@@ -58,9 +59,7 @@ class CourseListCreateView(generics.ListCreateAPIView):
         enrolled_course_ids = set()
 
         if self.request.user.is_authenticated:
-            enrolled_course_ids = self.request.user.enrollments.values_list(
-                "course_id", flat=True
-            )
+            enrolled_course_ids = active_course_ids(self.request.user)
 
         context["enrolled_course_ids"] = enrolled_course_ids
         return context
@@ -123,12 +122,7 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
             self.request.user.is_authenticated
             and course.instructor_id == self.request.user.id
         )
-        context["is_enrolled"] = (
-            self.request.user.is_authenticated
-            and course.enrollments.filter(
-                student=self.request.user, status="active"
-            ).exists()
-        )
+        context["is_enrolled"] = is_enrolled(self.request.user, course)
 
         return context
 

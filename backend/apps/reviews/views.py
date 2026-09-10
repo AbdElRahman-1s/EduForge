@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from apps.accounts.models import User
 from apps.courses.models import Course
-from apps.enrollments.models import Enrollment
+from apps.enrollments.services import is_enrolled
 
 from .models import Review
 from .pagination import ReviewListPagination
@@ -41,9 +41,7 @@ class ReviewListCreateView(generics.ListCreateAPIView):
                 {"detail": "Instructors cannot review their own courses."}
             )
 
-        if not Enrollment.objects.filter(
-            student=user, course=course, status=Enrollment.Status.ACTIVE
-        ).exists():
+        if not is_enrolled(user, course):
             raise PermissionDenied(
                 {"detail": "An active enrollment is required to review this course."}
             )

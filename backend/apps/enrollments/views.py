@@ -37,9 +37,13 @@ class EnrollmentCreateView(generics.CreateAPIView):
                 {"detail": "Course is not published"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if course.price > 0:
+        if course.price and course.price > 0:
+            course_id = self.kwargs["course_id"]
             return Response(
-                {"detail": "Course is not free"}, status=status.HTTP_400_BAD_REQUEST
+                {
+                    "detail": f"Course is not free, use /api/courses/{course_id}/checkout/"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
         if Enrollment.objects.filter(student=request.user, course=course).exists():
             return Response(

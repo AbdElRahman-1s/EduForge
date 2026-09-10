@@ -111,6 +111,35 @@ class EnrollmentCreateAPITests(EnrollmentTestDataMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(Enrollment.objects.filter(student=self.student, course=paid).exists())
 
+    def test_paid_course_rejection_directs_to_checkout(self):
+        paid = self._create_course(self.instructor, "Paid", price="19.99")
+        self._auth_as(self.student)
+
+        response = self.client.post(self._enroll_url(paid), {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("/checkout/", response.data["detail"])
+
+    def test_null_price_course_is_enrollable_without_500(self):
+        null_price = Course.objects.create(
+            title="Null price course",
+            description="Null price description",
+            instructor=self.instructor,
+            category=self.category,
+            level=Course.CourseLevel.BEGINNER,
+            price=None,
+            published=True,
+        )
+        null_price.topics.add(self.topic)
+        self._auth_as(self.student)
+
+        response = self.client.post(self._enroll_url(null_price), {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            Enrollment.objects.filter(student=self.student, course=null_price).exists()
+        )
+
     def test_student_id_in_payload_cannot_enroll_another_user(self):
         self._auth_as(self.student)
 
@@ -213,6 +242,20 @@ class MyLearningAPITests(EnrollmentTestDataMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {"count": 0, "results": []})
+
+    def test_mine_includes_suspended_enrollments(self):
+        # "My Learning" lists every enrollment record, including suspended ones.
+        Enrollment.objects.create(
+            student=self.student,
+            course=self.free_course,
+            status=Enrollment.Status.SUSPENDED,
+        )
+        self._auth_as(self.student)
+
+        response = self.client.get(self.mine_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
 
     def test_query_count_does_not_grow_with_related_course_data(self):
         first = self.free_course

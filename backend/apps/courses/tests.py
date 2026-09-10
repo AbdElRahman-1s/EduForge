@@ -4,6 +4,7 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
+from apps.enrollments.models import Enrollment
 from apps.reviews.models import Review
 
 from .models import Category, Course, Lesson, Section, Topic
@@ -329,3 +330,77 @@ class CourseReviewAggregationTests(APITestCase):
         self.assertEqual(response.data["total_duration_seconds"], 420)
         self.assertEqual(response.data["review_count"], 2)
         self.assertEqual(response.data["avg_rating"], 3.5)
+
+
+class CourseEntitlementAgreementTests(APITestCase):
+    """`is_enrolled` uses the active-only definition in list and detail alike."""
+
+    def setUp(self):
+        self.list_url = reverse("course-list")
+        self.instructor = User.objects.create_user(
+            username="entitlement-instructor",
+            email="entitlement-instructor@example.com",
+            role=User.Role.INSTRUCTOR,
+        )
+        self.category = Category.objects.create(name="Entitlement")
+        self.topic = Topic.objects.create(name="Access")
+        self.student = User.objects.create_user(
+            username="entitlement-student",
+            email="entitlement-student@example.com",
+        )
+        self.active_course = self._course("Entitlement active course")
+        self.suspended_course = self._course("Entitlement suspended course")
+
+    def _course(self, title):
+        course = Course.objects.create(
+            title=title,
+            description=f"{title} description",
+            instructor=self.instructor,
+            category=self.category,
+            level=Course.CourseLevel.BEGINNER,
+            price="29.99",
+            thumbnail="courses/entitlement.png",
+            published=True,
+        )
+        course.topics.add(self.topic)
+        return course
+
+    def _auth_as(self, user):
+        token = RefreshToken.for_user(user).access_token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+
+    def test_list_and_detail_agree_for_active_and_suspended(self):
+        Enrollment.objects.create(
+            student=self.student,
+            course=self.active_course,
+            status=Enrollment.Status.ACTIVE,
+        )
+        Enrollment.objects.create(
+            student=self.student,
+            course=self.suspended_course,
+            status=Enrollment.Status.SUSPENDED,
+        )
+        self._auth_as(self.student)
+
+        list_response = self.client.get(self.list_url)
+        by_title = {course["title"]: course for course in list_response.data["results"]}
+        self.assertTrue(by_title[self.active_course.title]["is_enrolled"])
+        self.assertFalse(by_title[self.suspended_course.title]["is_enrolled"])
+
+        active_detail = self.client.get(
+            reverse("course-detail", args=[self.active_course.pk])
+        )
+        suspended_detail = self.client.get(
+            reverse("course-detail", args=[self.suspended_course.pk])
+        )
+        self.assertEqual(active_detail.status_code, status.HTTP_200_OK)
+        self.assertEqual(suspended_detail.status_code, status.HTTP_200_OK)
+        self.assertTrue(active_detail.data["is_enrolled"])
+        self.assertFalse(suspended_detail.data["is_enrolled"])
+
+    def test_anonymous_users_never_see_is_enrolled_true(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for course in response.data["results"]:
+            self.assertFalse(course["is_enrolled"])
