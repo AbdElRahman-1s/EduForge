@@ -8,16 +8,24 @@
 
 # Scope
 
-This contract covers student enrollment into a course and listing the
-authenticated user's own enrollments.
+This contract covers enrollment into a course and listing the authenticated
+user's own enrollments.
 
-Only **free enrollment** is implemented. Paid enrollment requires the payments
-milestone and is rejected by this endpoint today.
+Free courses enroll directly through this endpoint. Paid courses are rejected
+here and completed through the checkout + webhook flow documented in
+`orders_api_contract.md`: the student checks out, Stripe confirms payment, and
+the webhook creates the enrollment — so a paid student ends up with an
+identical `Enrollment` row to a free student, and entitlement (`is_enrolled`,
+lesson videos, reviews) is the same either way.
 
 ## Supported Endpoints
 
 - `POST /api/courses/{course_id}/enroll/`
 - `GET /api/enrollments/mine/`
+
+Paid-enrollment endpoints are documented in `orders_api_contract.md`:
+- `POST /api/courses/{course_id}/checkout/`
+- `POST /api/webhooks/stripe/`
 
 ---
 
@@ -37,8 +45,11 @@ An enrollment is a link between a user and a course.
 
 Enrollments are ordered newest-first (`-enrolled_at`) at the model level.
 
-`status` is either `active` or `suspended` and defaults to `active`. Only active enrollments unlock non-free lesson videos. Suspended enrollments remain stored but are not treated as enrolled for curriculum access. The `progress_percent` value exposed by `GET /api/enrollments/mine/` is a hardcoded
-placeholder — see section 2.
+`status` is either `active` or `suspended` and defaults to `active`. Only active
+enrollments count for entitlement — `is_enrolled`, non-free lesson videos, and
+review eligibility. Suspended enrollments remain stored but are not treated as
+enrolled. The `progress_percent` value exposed by
+`GET /api/enrollments/mine/` is a hardcoded placeholder — see section 2.
 
 ---
 
@@ -103,7 +114,8 @@ Checks run in this order, and the first failure is returned:
 1. The course must exist — otherwise `404`.
 2. The caller must not be the course's own instructor.
 3. The course must be published.
-4. The course must be free (`price` equal to `0`).
+4. The course must be free — `price` `null` or `0`. Paid courses are rejected
+   and directed to `POST /api/courses/{course_id}/checkout/`.
 5. The caller must not already be enrolled.
 
 ---
@@ -180,12 +192,15 @@ Applies to unpublished courses as well — see the note below.
 
 ```json
 {
-  "detail": "Course is not free"
+  "detail": "Course is not free, use /api/courses/12/checkout/"
 }
 ```
 
-Returned for any course with `price` greater than `0`. Paid enrollment is not
-supported yet.
+Returned for any course with `price` greater than `0`. Paid courses cannot be
+enrolled through this endpoint. The client should call
+`POST /api/courses/{course_id}/checkout/` instead; once payment succeeds and
+the Stripe webhook fulfills the order, the student receives an active
+enrollment exactly like a free student (see `orders_api_contract.md`).
 
 ### Already Enrolled
 
@@ -405,10 +420,6 @@ Only `GET` is supported. There is no unenroll endpoint.
 
 # Known Issues
 
-- **Published course with a `NULL` price returns `500`.** The free check
-  compares `price > 0` without a null guard. Publishing through the API always
-  sets a price, so this is only reachable for courses published through the
-  Django admin or directly in the database.
 - **`GET /api/enrollments/mine/` exposes no enrollment identifier.** `id` is the
   course ID, so an unenroll endpoint cannot be addressed by enrollment ID
   without changing this payload.
@@ -422,8 +433,9 @@ Intentionally **out of scope** for this contract:
 - Unenrolling / cancellation
 - Pagination on `GET /api/enrollments/mine/`
 - Real `progress_percent` values
-- An `is_enrolled` flag on the Course Details response
-- Paid enrollment, checkout, and payment webhooks
 - Lesson progress and course completion
-- Unlocking locked lesson videos for enrolled students
+
+Paid enrollment (checkout + webhook) and the `is_enrolled` / locked-video
+entitlement shipped with the payments milestone — see `orders_api_contract.md`
+and `courses_api_contract.md`.
 

@@ -179,7 +179,7 @@ None required.
 - Unpublished courses do not appear in this endpoint, not even for their owner.
 - No filtering, search, or ordering query parameters are supported yet. Only
   `page` is honoured.
-- Includes `is_enrolled` field: A boolean indicating if the requesting authenticated user is enrolled in the course. Returns `false` for anonymous users.
+- Includes `is_enrolled` field: A boolean indicating if the requesting authenticated user is enrolled in the course. Only **active** enrollments count — a suspended enrollment reports `false`. Returns `false` for anonymous users.
 
 ## Success
 
@@ -244,8 +244,8 @@ Optional. Authenticated instructors can access their own unpublished courses.
   `404 Not Found` for an unpublished course.
 - Sections are returned ordered by their `order` field.
 - Lessons are returned ordered by their `order` field.
-- Includes `is_enrolled` field: A boolean indicating if the requesting authenticated user is enrolled in this course. Returns `false` for anonymous users.
-- The `video` field is returned when the lesson is a free preview, when the requester is the course owner, **or** when the requester is an enrolled student. Otherwise it is `null`.
+- Includes `is_enrolled` field: A boolean indicating if the requesting authenticated user is enrolled in this course. Only **active** enrollments count — a suspended enrollment reports `false`. Returns `false` for anonymous users.
+- The `video` field is returned when the lesson is a free preview, when the requester is the course owner, **or** when the requester holds an **active** enrollment. Otherwise it is `null`.
 
 ## Success
 

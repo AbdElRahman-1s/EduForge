@@ -12,9 +12,10 @@ from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
-from apps.courses.models import Category, Course
+from apps.courses.models import Category, Course, Lesson, Section
 from apps.enrollments.models import Enrollment
 from apps.orders.models import Order
+from apps.reviews.models import Review
 
 
 def _completed_event(session_id, amount_total):
@@ -417,3 +418,96 @@ class StripeWebhookConcurrencyTests(TransactionTestCase):
         self.assertEqual(
             Enrollment.objects.filter(student=student, course=course).count(), 1
         )
+
+
+class WebhookEntitlementIntegrationTests(APITestCase):
+    """A paid student, enrolled via the webhook, is entitled like a free one."""
+
+    def setUp(self):
+        self.instructor = User.objects.create_user(
+            username="paid-instructor",
+            email="paid-instructor@example.com",
+            role=User.Role.INSTRUCTOR,
+        )
+        self.category = Category.objects.create(name="Paid entitlement")
+        self.student = User.objects.create_user(
+            username="paid-student", email="paid-student@example.com"
+        )
+        self.course = Course.objects.create(
+            instructor=self.instructor,
+            category=self.category,
+            title="Paid entitlement course",
+            description="Description",
+            level=Course.CourseLevel.BEGINNER,
+            price="79.00",
+            published=True,
+        )
+        section = Section.objects.create(course=self.course, title="Section", order=1)
+        self.lesson = Lesson.objects.create(
+            section=section,
+            title="Premium lesson",
+            duration_seconds=300,
+            video="https://cdn.example.com/premium.mp4",
+            free=False,
+            order=1,
+        )
+        self.order = Order.objects.create(
+            student=self.student,
+            course=self.course,
+            amount="79.00",
+            provider_reference="cs_paid_access",
+        )
+        self.detail_url = reverse("course-detail", args=[self.course.pk])
+        self.reviews_url = reverse(
+            "course-reviews", kwargs={"course_id": self.course.pk}
+        )
+
+    def _auth_as(self, user):
+        token = RefreshToken.for_user(user).access_token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+
+    def _deliver_completed(self):
+        with patch(
+            "apps.orders.gateways.stripe.Webhook.construct_event",
+            return_value=_completed_event("cs_paid_access", 7900),
+        ):
+            return self.client.post(
+                reverse("stripe-webhook"),
+                data=b"{}",
+                content_type="application/json",
+                HTTP_STRIPE_SIGNATURE="test_sig",
+            )
+
+    def _lesson_video(self, detail):
+        return detail.data["sections"][0]["lessons"][0]["video"]
+
+    def test_before_fulfillment_paid_course_is_locked(self):
+        self._auth_as(self.student)
+
+        detail = self.client.get(self.detail_url)
+        self.assertEqual(detail.status_code, status.HTTP_200_OK)
+        self.assertFalse(detail.data["is_enrolled"])
+        self.assertIsNone(self._lesson_video(detail))
+
+        review = self.client.post(self.reviews_url, {"rating": 4}, format="json")
+        self.assertEqual(review.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Review.objects.count(), 0)
+
+    def test_webhook_fulfillment_unlocks_video_and_reviews(self):
+        response = self._deliver_completed()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Enrollment.objects.count(), 1)
+
+        self._auth_as(self.student)
+        detail = self.client.get(self.detail_url)
+        self.assertEqual(detail.status_code, status.HTTP_200_OK)
+        self.assertTrue(detail.data["is_enrolled"])
+        self.assertEqual(
+            self._lesson_video(detail), "https://cdn.example.com/premium.mp4"
+        )
+
+        review = self.client.post(
+            self.reviews_url, {"rating": 4, "comment": "Worth it"}, format="json"
+        )
+        self.assertEqual(review.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Review.objects.count(), 1)
